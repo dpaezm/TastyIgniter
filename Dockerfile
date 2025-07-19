@@ -27,7 +27,7 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --optimize-autoloader
 
-COPY package.json package.lock ./
+COPY package.json package-lock.json ./
 RUN npm install
 
 # Copiar el resto de la aplicación y construir assets

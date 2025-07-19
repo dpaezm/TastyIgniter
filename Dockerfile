@@ -1,5 +1,5 @@
 # Fase 1: Construcción con todas las herramientas
-FROM php:8.2-fpm as builder
+FROM php:8.3-fpm as builder
 
 # Instalar dependencias del sistema, extensiones de PHP, Node.js y Composer
 RUN apt-get update && apt-get install -y \
@@ -39,7 +39,7 @@ RUN composer dump-autoload --optimize
 # ---------------------------------------------------------------------
 
 # Fase 2: Imagen final de producción
-FROM php:8.2-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # Instalar dependencias del sistema necesarias para las extensiones de PHP
 RUN apk add --no-cache \

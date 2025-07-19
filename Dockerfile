@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
-    icu-devtools \
+    libicu-dev \
     nodejs \
     npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -49,7 +49,8 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     freetype-dev \
     libxml2-dev \
-    icu-dev
+    icu-dev \
+    oniguruma-dev
 
 # Instalar solo las extensiones necesarias
 RUN docker-php-ext-configure intl && \

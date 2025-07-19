@@ -28,13 +28,11 @@ RUN composer dump-autoload --optimize
 # Fase 2: Imagen final de producción
 FROM php:8.3-fpm
 
-# ----> INICIO DEL CAMBIO <----
 # Instalar solo las librerías runtime necesarias para las extensiones
 RUN apt-get update && apt-get install -y \
     libpng16-16 \
     libzip4 \
     && rm -rf /var/lib/apt/lists/*
-# ----> FIN DEL CAMBIO <----
 
 WORKDIR /app
 
@@ -42,6 +40,9 @@ WORKDIR /app
 COPY --from=builder /app .
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+
+# Establecer los permisos correctos para las carpetas de Laravel
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 # Exponer el puerto
 EXPOSE 3000

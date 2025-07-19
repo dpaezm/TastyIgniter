@@ -25,14 +25,14 @@ RUN composer dump-autoload --optimize
 
 # ---------------------------------------------------------------------
 
-# Fase 2: Imagen final de producción (USANDO LA IMAGEN COMPLETA)
+# Fase 2: Imagen final de producción
 FROM php:8.3-fpm
 
 WORKDIR /app
 
-# Copiar la aplicación construida desde la fase anterior
+# Copiar la aplicación construida y la configuración de las extensiones de PHP
 COPY --from=builder /app .
-COPY --from=builder /usr/local/etc/php/conf.d/docker-php-ext-* /usr/local/etc/php/conf.d/
+COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 # Exponer el puerto y establecer el comando de arranque
 EXPOSE 3000

@@ -7,3 +7,4 @@ docker/Dockerfile
 tests
 docker-compose*
 .git
+.github

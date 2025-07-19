@@ -1,33 +1,20 @@
 # Fase 1: Construcción con todas las herramientas
 FROM php:8.3-fpm as builder
 
-# Instalar dependencias del sistema, extensiones de PHP, Node.js y Composer
+# Instalar dependencias del sistema y Composer
 RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    zip \
-    curl \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    libonig-dev \
-    libxml2-dev \
-    libicu-dev \
-    nodejs \
-    npm \
+    git unzip zip curl nodejs npm \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    libzip-dev libonig-dev libxml2-dev libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql exif intl zip mbstring xml
-
-# Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copiar solo los archivos de dependencias e instalar
+# Instalar dependencias de PHP y Node
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --optimize-autoloader
-
 COPY package.json package-lock.json ./
 RUN npm install
 
@@ -38,29 +25,14 @@ RUN composer dump-autoload --optimize
 
 # ---------------------------------------------------------------------
 
-# Fase 2: Imagen final de producción
-FROM php:8.3-fpm-alpine
-
-# Instalar dependencias del sistema necesarias para las extensiones de PHP
-RUN apk add --no-cache \
-    $PHPIZE_DEPS \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libxml2-dev \
-    icu-dev \
-    oniguruma-dev
-
-# Instalar solo las extensiones necesarias
-RUN docker-php-ext-configure intl && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install pdo pdo_mysql exif gd intl zip mbstring xml
+# Fase 2: Imagen final de producción (USANDO LA IMAGEN COMPLETA)
+FROM php:8.3-fpm
 
 WORKDIR /app
 
 # Copiar la aplicación construida desde la fase anterior
 COPY --from=builder /app .
+COPY --from=builder /usr/local/etc/php/conf.d/docker-php-ext-* /usr/local/etc/php/conf.d/
 
 # Exponer el puerto y establecer el comando de arranque
 EXPOSE 3000

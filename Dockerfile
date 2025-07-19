@@ -30,9 +30,12 @@ FROM php:8.3-fpm
 
 WORKDIR /app
 
-# Copiar la aplicación construida y la configuración de las extensiones de PHP
+# ----> INICIO DEL CAMBIO <----
+# Copiar la aplicación, la configuración de PHP y las extensiones compiladas
 COPY --from=builder /app .
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+# ----> FIN DEL CAMBIO <----
 
 # Exponer el puerto y establecer el comando de arranque
 EXPOSE 3000

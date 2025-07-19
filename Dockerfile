@@ -28,17 +28,23 @@ RUN composer dump-autoload --optimize
 # Fase 2: Imagen final de producción
 FROM php:8.3-fpm
 
+# ----> INICIO DEL CAMBIO <----
+# Instalar solo las librerías runtime necesarias para las extensiones
+RUN apt-get update && apt-get install -y \
+    libpng16-16 \
+    libzip4 \
+    && rm -rf /var/lib/apt/lists/*
+# ----> FIN DEL CAMBIO <----
+
 WORKDIR /app
 
-# ----> INICIO DEL CAMBIO <----
 # Copiar la aplicación, la configuración de PHP y las extensiones compiladas
 COPY --from=builder /app .
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-# ----> FIN DEL CAMBIO <----
 
-# Exponer el puerto y establecer el comando de arranque
+# Exponer el puerto
 EXPOSE 3000
 
-# Comando de arranque (para la instalación inicial)
-CMD ["sh", "-c", "touch .env && php artisan igniter:install --no-interaction && php artisan serve --host=0.0.0.0 --port=3000"]
+# Comando de arranque final y estable
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]

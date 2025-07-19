@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
+    icu-devtools \
     nodejs \
     npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -40,7 +41,6 @@ RUN composer dump-autoload --optimize
 # Fase 2: Imagen final de producción
 FROM php:8.2-fpm-alpine
 
-# ----> INICIO DEL CAMBIO <----
 # Instalar dependencias del sistema necesarias para las extensiones de PHP
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
@@ -48,12 +48,13 @@ RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
-    libxml2-dev
-# ----> FIN DEL CAMBIO <----
+    libxml2-dev \
+    icu-dev
 
 # Instalar solo las extensiones necesarias
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql exif gd intl zip mbstring xml
+RUN docker-php-ext-configure intl && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install pdo pdo_mysql exif gd intl zip mbstring xml
 
 WORKDIR /app
 

@@ -35,19 +35,33 @@ COPY . .
 RUN npm run prod
 RUN composer dump-autoload --optimize
 
+# ---------------------------------------------------------------------
+
 # Fase 2: Imagen final de producción
 FROM php:8.2-fpm-alpine
 
+# ----> INICIO DEL CAMBIO <----
+# Instalar dependencias del sistema necesarias para las extensiones de PHP
+RUN apk add --no-cache \
+    $PHPIZE_DEPS \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libxml2-dev
+# ----> FIN DEL CAMBIO <----
+
 # Instalar solo las extensiones necesarias
-RUN docker-php-ext-install pdo pdo_mysql exif gd intl zip mbstring xml
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql exif gd intl zip mbstring xml
 
 WORKDIR /app
 
 # Copiar la aplicación construida desde la fase anterior
 COPY --from=builder /app .
 
-# Exponer el puerto
+# Exponer el puerto y establecer el comando de arranque
 EXPOSE 3000
 
-# Comando de arranque
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]
+# Comando de arranque (para la instalación inicial)
+CMD ["sh", "-c", "touch .env && php artisan igniter:install --no-interaction && php artisan serve --host=0.0.0.0 --port=3000"]

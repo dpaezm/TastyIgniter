@@ -1,31 +1,25 @@
 #!/bin/sh
-set -e
-
-# Asegura que el .env existe
-if [ ! -f /var/www/html/.env ]; then
-    echo "[entrypoint] .env no existe, copiando plantilla..."
-    [ -f /var/www/html/.env.example ] && cp /var/www/html/.env.example /var/www/html/.env || touch /var/www/html/.env
-fi
 
 echo "--- INICIANDO ENTRYPOINT SCRIPT ---"
-echo "--- Limpiando cachés... ---"
-CACHE_DRIVER=file php artisan config:clear
-CACHE_DRIVER=file php artisan route:clear
-CACHE_DRIVER=file php artisan view:clear
 
-# ✅ Flag correcto
-INSTALL_FLAG="/var/www/html/.env.installed"
-
-if [ ! -f "$INSTALL_FLAG" ]; then
-  echo "--- Primera ejecución detectada. Ejecutando instalación completa... ---"
-  php artisan igniter:install --no-interaction
-  [ ! -L /var/www/html/public/storage ] && php artisan storage:link
-  touch "$INSTALL_FLAG"
-else
-  echo "--- Sistema ya instalado previamente. Ejecutando migraciones... ---"
-  php artisan migrate --force
-  [ ! -L /var/www/html/public/storage ] && php artisan storage:link
+# Copiar .env si no existe
+if [ ! -f .env ]; then
+  echo "[entrypoint] .env no existe, copiando plantilla..."
+  cp .env.example .env
 fi
 
-echo "--- Arrancando PHP-FPM ---"
-exec php-fpm
+# Generar clave si no existe
+if ! grep -q "APP_KEY=base64" .env; then
+  echo "[entrypoint] Generando APP_KEY..."
+  php artisan key:generate
+fi
+
+# Migraciones y caches
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan migrate --force
+
+# Lanzar servidor integrado
+echo "--- Arrancando Laravel en puerto 80 ---"
+exec php artisan serve --host=0.0.0.0 --port=80

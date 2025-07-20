@@ -53,4 +53,4 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 EXPOSE 3000
 
 # Comando de arranque 
-CMD ["php", "artisan", "db:seed", "--force"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]

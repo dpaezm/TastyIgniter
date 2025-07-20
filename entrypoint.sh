@@ -19,6 +19,12 @@ if [ ! -f "$APP_DIR/.env" ]; then
   php artisan key:generate --force
 fi
 
+# entrypoint.sh
+if ! grep -q "APP_KEY=" .env && [ ! -z "$APP_KEY" ]; then
+  echo "APP_KEY=$APP_KEY" >> .env
+  echo "--- APP_KEY añadido al .env automáticamente ---"
+fi
+
 # Instalación inicial (sólo si la base de datos aún no está configurada)
 if ! php artisan migrate:status > /dev/null 2>&1; then
   echo "--- Base de datos vacía. Ejecutando instalación por primera vez... ---"

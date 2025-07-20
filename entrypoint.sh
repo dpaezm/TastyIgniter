@@ -1,6 +1,19 @@
 #!/bin/sh
 set -e
 
+###############################################
+# 1️⃣  GARANTIZAR QUE EXISTE /var/www/html/.env
+###############################################
+if [ ! -f /var/www/html/.env ]; then
+    echo "[entrypoint] .env no existe, copiando plantilla..."
+    # Usa .env.example si está en la imagen; si no, crea uno vacío
+    if [ -f /var/www/html/.env.example ]; then
+        cp /var/www/html/.env.example /var/www/html/.env
+    else
+        touch /var/www/html/.env
+    fi
+fi
+
 echo "--- INICIANDO ENTRYPOINT SCRIPT ---"
 
 echo "--- Limpiando cachés... ---"

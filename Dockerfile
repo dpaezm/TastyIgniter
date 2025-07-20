@@ -1,4 +1,5 @@
 # --- FASE 1: Builder ---
+# Usamos una imagen completa para compilar todo sin problemas de dependencias.
 FROM php:8.3-fpm as builder
 
 # Instalar dependencias del sistema y Composer
@@ -39,4 +40,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 80
+
+# ----> ¡ESTA ES LA LÍNEA FINAL PARA PRODUCCIÓN! <----
 ENTRYPOINT ["entrypoint.sh"]

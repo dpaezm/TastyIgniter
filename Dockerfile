@@ -1,7 +1,7 @@
-# Imagen base única y completa
-FROM php:8.3-fpm
+# Fase 1: Construcción con todas las herramientas
+FROM php:8.3-fpm as builder
 
-# Instalar todas las dependencias del sistema, extensiones y Composer
+# Instalar dependencias del sistema y Composer
 RUN apt-get update && apt-get install -y \
     git unzip zip curl nodejs npm \
     libpng-dev libjpeg-dev libfreetype6-dev \
@@ -12,18 +12,47 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copiar todo el código de la aplicación
-COPY . .
-
-# Instalar dependencias de PHP y Node, y construir assets
+# Instalar dependencias de PHP y Node
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader
+COPY package.json package-lock.json ./
 RUN npm install
-RUN npm run prod
 
-# Establecer permisos
+# Copiar el resto de la aplicación y construir assets
+COPY . .
+RUN npm run prod
+RUN composer dump-autoload --optimize
+
+# ---------------------------------------------------------------------
+
+# Fase 2: Imagen final de producción
+FROM php:8.3-fpm
+
+# Instalar solo las librerías runtime necesarias para las extensiones
+RUN apt-get update && apt-get install -y \
+    libpng16-16 \
+    libzip4 \
+    libjpeg62-turbo \
+    libfreetype6 \
+    libicu72 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copiar la aplicación, la configuración de PHP y las extensiones compiladas
+COPY --from=builder /app .
+COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+
+# Establecer los permisos correctos para las carpetas de Laravel
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+
+# ----> ¡NUEVO! Copiar y hacer ejecutable el script de arranque <----
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Exponer el puerto
 EXPOSE 3000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]
+# ----> ¡NUEVO! Usar el script como punto de entrada <----
+ENTRYPOINT ["entrypoint.sh"]

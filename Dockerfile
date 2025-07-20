@@ -26,4 +26,4 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 # Exponer el puerto
 EXPOSE 3000
 
-CMD ["sh", "-c", "php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=3000"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]

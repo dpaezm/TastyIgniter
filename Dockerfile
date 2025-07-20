@@ -32,7 +32,6 @@ COPY --from=builder /var/www/html .
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY nginx.conf /etc/nginx/nginx.conf
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN chown -R www-data:www-data storage bootstrap/cache
@@ -41,4 +40,4 @@ EXPOSE 80
 
 # Usa ENTRYPOINT para setup y CMD para lanzar servicios
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]
+CMD []

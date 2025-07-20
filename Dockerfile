@@ -17,26 +17,28 @@ RUN npm install
 RUN npm run prod
 
 # --- FASE 2: Producción ---
+# ... (fase builder permanece igual)
+
+# --- FASE DE PRODUCCIÓN ---
 FROM php:8.3-fpm
 
-# Instalar Nginx y las librerías runtime
 RUN apt-get update && apt-get install -y nginx \
     libpng16-16 libzip4 libjpeg62-turbo libfreetype6 libicu72 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
-
-# Copiar la aplicación, configuraciones y extensiones desde el builder
-COPY --from=builder /var/www/html .
+COPY --from=builder /var/www/html . 
+# Copia configuraciones de PHP y extensiones
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY nginx.conf /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Establecer permisos
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80
+
+# Usa ENTRYPOINT para setup y CMD para lanzar servicios
 ENTRYPOINT ["entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

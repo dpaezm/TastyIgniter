@@ -2,28 +2,26 @@
 set -e
 
 echo "--- ENTRYPOINT iniciado ---"
+echo "--- Variables de entorno cargadas ---"
+env | grep -E '^(APP_|DB_|CACHE_|SESSION_)'
+
+# Forzamos drivers simples para evitar errores si aún no está migrada la base de datos
+export CACHE_DRIVER=file
+export SESSION_DRIVER=file
 
 APP_DIR="/var/www/html"
 cd "$APP_DIR"
 
-echo "--- Variables de entorno cargadas ---"
-env | grep -E "APP|DB|CACHE|SESSION"
-
-export CACHE_DRIVER=file
-export SESSION_DRIVER=file
-
-# Crear .env si no existe
+# Generar .env si no existe
 if [ ! -f "$APP_DIR/.env" ]; then
   echo "--- .env no encontrado, creando uno nuevo ---"
   cp .env.example .env
+fi
 
-  # Añadir APP_KEY si viene por entorno
-  if [ ! -z "$APP_KEY" ]; then
-    echo "APP_KEY=$APP_KEY" >> .env
-    echo "--- APP_KEY añadido al .env automáticamente ---"
-  else
-    php artisan key:generate --force || true
-  fi
+# Asegurar que APP_KEY está presente
+if ! grep -q "^APP_KEY=" .env && [ -n "$APP_KEY" ]; then
+  echo "APP_KEY=$APP_KEY" >> .env
+  echo "--- APP_KEY añadido al .env automáticamente ---"
 fi
 
 # Instalación inicial si no hay migraciones
@@ -36,10 +34,18 @@ else
   php artisan migrate --force
 fi
 
+# Limpiar cachés
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
 echo "--- Arrancando php-fpm y nginx... ---"
-php-fpm -D
+php-fpm &
+
+# Esperar a que php-fpm cree el socket antes de lanzar nginx
+while [ ! -S /var/run/php/php-fpm.sock ]; do
+  echo "Esperando php-fpm.sock..."
+  sleep 1
+done
+
 exec nginx -g "daemon off;"

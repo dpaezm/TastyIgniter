@@ -28,12 +28,16 @@ RUN composer dump-autoload --optimize
 # Fase 2: Imagen final de producción
 FROM php:8.3-fpm
 
+# ----> ¡ESTA ES LA PARTE CLAVE! <----
 # Instalar solo las librerías runtime necesarias para las extensiones
 RUN apt-get update && apt-get install -y \
     libpng16-16 \
     libzip4 \
     libjpeg62-turbo \
+    libfreetype6 \
+    libicu72 \
     && rm -rf /var/lib/apt/lists/*
+# ------------------------------------
 
 WORKDIR /app
 

@@ -42,10 +42,4 @@ php artisan view:clear
 echo "--- Arrancando php-fpm y nginx... ---"
 php-fpm &
 
-# Esperar a que php-fpm cree el socket antes de lanzar nginx
-while [ ! -S /var/run/php/php-fpm.sock ]; do
-  echo "Esperando php-fpm.sock..."
-  sleep 1
-done
-
 exec nginx -g "daemon off;"

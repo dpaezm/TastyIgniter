@@ -47,12 +47,8 @@ COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions
 # Establecer los permisos correctos para las carpetas de Laravel
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-# ----> ¡NUEVO! Copiar y hacer ejecutable el script de arranque <----
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # Exponer el puerto
 EXPOSE 3000
 
-# ----> ¡NUEVO! Usar el script como punto de entrada <----
-ENTRYPOINT ["entrypoint.sh"]
+# ----> COMANDO DE INSTALACIÓN <----
+CMD ["sh", "-c", "php artisan migrate --force --seed && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=3000"]

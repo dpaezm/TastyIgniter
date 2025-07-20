@@ -1,7 +1,7 @@
-# Fase 1: Construcción con todas las herramientas
-FROM php:8.3-fpm as builder
+# Imagen base única y completa
+FROM php:8.3-fpm
 
-# Instalar dependencias del sistema y Composer
+# Instalar todas las dependencias del sistema, extensiones y Composer
 RUN apt-get update && apt-get install -y \
     git unzip zip curl nodejs npm \
     libpng-dev libjpeg-dev libfreetype6-dev \
@@ -12,45 +12,19 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Instalar dependencias de PHP y Node
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --optimize-autoloader
-COPY package.json package-lock.json ./
-RUN npm install
-
-# Copiar el resto de la aplicación y construir assets
+# Copiar todo el código de la aplicación
 COPY . .
+
+# Instalar dependencias de PHP y Node, y construir assets
+RUN composer install --no-dev --optimize-autoloader
+RUN npm install
 RUN npm run prod
-RUN composer dump-autoload --optimize
 
-# ---------------------------------------------------------------------
-
-# Fase 2: Imagen final de producción
-FROM php:8.3-fpm
-
-# ----> ¡ESTA ES LA PARTE CLAVE! <----
-# Instalar solo las librerías runtime necesarias para las extensiones
-RUN apt-get update && apt-get install -y \
-    libpng16-16 \
-    libzip4 \
-    libjpeg62-turbo \
-    libfreetype6 \
-    libicu72 \
-    && rm -rf /var/lib/apt/lists/*
-# ------------------------------------
-
-WORKDIR /app
-
-# Copiar la aplicación, la configuración de PHP y las extensiones compiladas
-COPY --from=builder /app .
-COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
-COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-
-# Establecer los permisos correctos para las carpetas de Laravel
+# Establecer permisos
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 # Exponer el puerto
 EXPOSE 3000
 
-# Comando de arranque 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]
+# Comando de arranque que HACE TODO: Limpia, migra, siembra y arranca.
+CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=3000"]

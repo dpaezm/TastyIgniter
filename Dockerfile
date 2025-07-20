@@ -1,54 +1,36 @@
-# Fase 1: Construcción con todas las herramientas
-FROM php:8.3-fpm as builder
+# Usamos una única imagen base completa para máxima compatibilidad
+FROM php:8.3-fpm
 
-# Instalar dependencias del sistema y Composer
+# Instalar todas las dependencias del sistema de una vez
 RUN apt-get update && apt-get install -y \
     git unzip zip curl nodejs npm \
     libpng-dev libjpeg-dev libfreetype6-dev \
     libzip-dev libonig-dev libxml2-dev libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql exif intl zip mbstring xml
+    && docker-php-ext-install gd pdo pdo_mysql exif intl zip mbstring xml \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Instalar dependencias de PHP y Node
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader
-COPY package.json package-lock.json ./
-RUN npm install
-
-# Copiar el resto de la aplicación y construir assets
+# ---> ¡EL CAMBIO CLAVE! Copiamos todo el código ANTES de instalar dependencias <---
 COPY . .
+
+# Ahora ejecutamos la instalación de dependencias, que ya encontrará el archivo 'artisan'
+RUN composer install --no-dev --optimize-autoloader
+RUN npm install
 RUN npm run prod
-RUN composer dump-autoload --optimize
 
-# ---------------------------------------------------------------------
-
-# Fase 2: Imagen final de producción
-FROM php:8.3-fpm
-
-# Instalar solo las librerías runtime necesarias para las extensiones
-RUN apt-get update && apt-get install -y \
-    libpng16-16 \
-    libzip4 \
-    libjpeg62-turbo \
-    libfreetype6 \
-    libicu72 \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copiar la aplicación, la configuración de PHP y las extensiones compiladas
-COPY --from=builder /app .
-COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
-COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-
-# Establecer los permisos correctos para las carpetas de Laravel
+# Establecer permisos
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+
+# Copiar y hacer ejecutable nuestro script de arranque inteligente
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Exponer el puerto
 EXPOSE 3000
 
-# ----> COMANDO DE INSTALACIÓN <----
-CMD ["sh", "-c", "php artisan migrate --force --seed && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=3000"]
+# Usar el script como punto de entrada
+ENTRYPOINT ["entrypoint.sh"]

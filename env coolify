@@ -1,0 +1,15 @@
+APP_NAME=Beautiful Parrilla
+APP_ENV=production
+APP_KEY=base64:L90YAVul0rP/x8xE7ZGS3LwKx28t5WxUtJjPGKkuKXA=
+APP_DEBUG=false
+APP_URL=https://beautiful-app.gridded.agency
+DB_CONNECTION=mysql
+DB_HOST=10.0.1.7
+DB_PORT=3306
+DB_DATABASE=default
+DB_USERNAME=mariadb
+DB_PASSWORD=iBte4cWugYLq5bGyFIERcmdJKQRHfFiNnyOxL76gB9KvEDlbkFL0czP23PtdNOkP
+LOG_CHANNEL=stderr
+SESSION_DRIVER=file
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync

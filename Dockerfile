@@ -52,5 +52,5 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 # Exponer el puerto
 EXPOSE 3000
 
-# Comando de arranque final y estable
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]
+# Comando de arranque (para la instalación inicial)
+CMD ["sh", "-c", "touch .env && php artisan igniter:install --no-interaction && php artisan serve --host=0.0.0.0 --port=3000"]

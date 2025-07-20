@@ -8,23 +8,19 @@ CACHE_DRIVER=file php artisan config:clear
 CACHE_DRIVER=file php artisan route:clear
 CACHE_DRIVER=file php artisan view:clear
 
-echo "--- Verificando existencia de tabla 'migrations' con migrate:status ---"
+# Usamos un flag simple para evitar múltiples instalaciones
+INSTALL_FLAG="/app/.env.installed"
 
-# Plan B: robusto y probado en entornos Laravel reales
-php artisan migrate:status >/dev/null 2>&1
-CHECK_RESULT=$?
-
-echo "--- Resultado del chequeo: $CHECK_RESULT ---"
-
-if [ "$CHECK_RESULT" != "0" ]; then
-  echo "--- ❌ No se encontró la tabla 'migrations'. Ejecutando instalación completa... ---"
+if [ ! -f "$INSTALL_FLAG" ]; then
+  echo "--- Primera ejecución detectada. Ejecutando instalación completa... ---"
   php artisan igniter:install --no-interaction
   php artisan storage:link
+  touch "$INSTALL_FLAG"
 else
-  echo "--- ✅ Tabla 'migrations' encontrada. Ejecutando migraciones... ---"
+  echo "--- Sistema ya instalado previamente. Ejecutando migraciones... ---"
   php artisan migrate --force
   php artisan storage:link
 fi
 
-echo "--- Instalación/Migración completada. Iniciando servidor ---"
+echo "--- Arrancando servidor ---"
 exec php artisan serve --host=0.0.0.0 --port=3000

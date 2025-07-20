@@ -1,24 +1,30 @@
 #!/bin/sh
 set -e
 
-# Forzamos CACHE_DRIVER=file solo para los comandos de setup
 export CACHE_DRIVER=file
 export SESSION_DRIVER=file
 
-# Verificamos si la base de datos ya está instalada
+# Crear .env si no existe
+if [ ! -f .env ]; then
+  echo "--- [ENTRYPOINT] Creando archivo .env desde .env.example ---"
+  cp .env.example .env
+fi
+
+# Instalar si la base de datos está vacía
 if ! php artisan migrate:status > /dev/null 2>&1; then
   echo "--- Base de datos vacía. Ejecutando instalación por primera vez... ---"
   php artisan igniter:install --no-interaction
+
   php artisan session:table
-php artisan cache:table
-php artisan migrate --force
+  php artisan cache:table
+  php artisan migrate --force
+
   php artisan storage:link
 else
   echo "--- La aplicación ya está instalada. Aplicando migraciones pendientes... ---"
   php artisan migrate --force
 fi
 
-# Limpiamos las cachés antes de arrancar en modo producción
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear

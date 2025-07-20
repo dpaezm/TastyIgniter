@@ -26,5 +26,4 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 # Exponer el puerto
 EXPOSE 3000
 
-# Comando de arranque que HACE TODO: Limpia, migra, siembra y arranca.
-CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=3000"]
+CMD ["sh", "-c", "php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=3000"]

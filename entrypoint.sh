@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 echo "--- ENTRYPOINT iniciado ---"
@@ -24,6 +24,9 @@ fi
 
 # Enlace a storage público
 [ ! -e public/storage ] && php artisan storage:link || true
+
+# 🔥 Activar tema personalizado y sincronizar extensiones
+php artisan ignite:sync || true
 
 # Instalación o migraciones
 if ! php artisan migrate:status > /dev/null 2>&1; then

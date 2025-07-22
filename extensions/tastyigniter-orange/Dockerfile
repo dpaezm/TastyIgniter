@@ -1,6 +1,7 @@
 # --- FASE 1: Builder ---
 FROM php:8.3-fpm as builder
 
+# Instalar dependencias del sistema y Composer
 RUN apt-get update && apt-get install -y \
     git unzip zip curl nodejs npm \
     libpng-dev libjpeg-dev libfreetype6-dev \
@@ -12,10 +13,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 COPY . .
-
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install
-RUN npm run build || npm run prod
+RUN npm run prod
 
 # --- FASE 2: Producción ---
 FROM php:8.3-fpm
@@ -33,15 +33,8 @@ COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# 🔥 Activar tema personalizado y sincronizar extensiones
-RUN php artisan extension:activate igniter.theme-orange \
- && php artisan ignite:sync \
- && php artisan config:clear \
- && php artisan view:clear
- 
 EXPOSE 80 9000
 
 ENTRYPOINT ["entrypoint.sh"]

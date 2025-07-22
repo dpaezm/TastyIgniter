@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y nginx \
 WORKDIR /var/www/html
 
 COPY --from=builder /var/www/html .
+COPY --from=builder /var/www/html/extensions /var/www/html/extensions
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 
@@ -40,7 +41,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache
 RUN php artisan ignite:sync \
  && php artisan config:clear \
  && php artisan view:clear
- 
+
 EXPOSE 80 9000
 
 ENTRYPOINT ["entrypoint.sh"]

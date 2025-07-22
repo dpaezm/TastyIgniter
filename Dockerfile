@@ -37,10 +37,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# 🔥 Activar tema personalizado y sincronizar extensiones
-RUN php artisan ignite:sync \
- && php artisan config:clear \
- && php artisan view:clear
 
 EXPOSE 80 9000
 

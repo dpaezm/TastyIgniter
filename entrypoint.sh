@@ -3,43 +3,54 @@ set -e
 
 echo "--- ENTRYPOINT iniciado ---"
 echo "--- Variables de entorno cargadas ---"
-env | grep -E '^(APP_|DB_|CACHE_|SESSION_)'
-
-# Forzamos drivers simples para evitar errores si aún no está migrada la base de datos
-export CACHE_DRIVER=file
-export SESSION_DRIVER=file
+env | grep -E '^(APP_|DB_|CACHE_|SESSION_|LOG_)?'
 
 APP_DIR="/var/www/html"
 cd "$APP_DIR"
 
-# Generar .env si no existe
-if [ ! -f "$APP_DIR/.env" ]; then
-  echo "--- .env no encontrado, creando uno nuevo ---"
+# Forzar drivers simples para evitar errores en primeras ejecuciones
+export CACHE_DRIVER=file
+export SESSION_DRIVER=file
+export LOG_CHANNEL=stderr
+
+# Crear .env si no existe
+if [ ! -f ".env" ]; then
+  echo "--- .env no encontrado. Creando uno nuevo desde .env.example ---"
   cp .env.example .env
 fi
 
-# Asegurar que APP_KEY está presente
+# Añadir APP_KEY si falta y se define por env
 if ! grep -q "^APP_KEY=" .env && [ -n "$APP_KEY" ]; then
+  echo "--- APP_KEY no encontrado en .env. Añadiéndolo... ---"
   echo "APP_KEY=$APP_KEY" >> .env
-  echo "--- APP_KEY añadido al .env automáticamente ---"
 fi
 
-# Instalación inicial si no hay migraciones
+# Comprobar si hay migraciones pendientes o base de datos vacía
+echo "--- Verificando estado de migraciones ---"
 if ! php artisan migrate:status > /dev/null 2>&1; then
-  echo "--- Base de datos vacía. Ejecutando instalación por primera vez... ---"
-  php artisan igniter:install --no-interaction
-  php artisan storage:link
+  echo "--- Base de datos vacía. Ejecutando instalación completa... ---"
+  php artisan igniter:install --no-interaction || true
+  php artisan storage:link || true
 else
-  echo "--- La aplicación ya está instalada. Aplicando migraciones pendientes... ---"
-  php artisan migrate --force
+  echo "--- Aplicando migraciones pendientes ---"
+  php artisan migrate --force || true
 fi
 
-# Limpiar cachés
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+# Limpiar y regenerar cachés
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
-echo "--- Arrancando php-fpm y nginx... ---"
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan view:cache || true
+
+# Asegurar permisos correctos
+echo "--- Ajustando permisos en storage y bootstrap/cache ---"
+chown -R www-data:www-data storage bootstrap/cache || true
+chmod -R ug+rwX storage bootstrap/cache || true
+
+echo "--- Iniciando servicios: php-fpm + nginx ---"
 php-fpm &
 
 exec nginx -g "daemon off;"

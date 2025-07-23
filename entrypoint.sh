@@ -26,7 +26,7 @@ fi
 [ ! -e public/storage ] && php artisan storage:link || true
 
 # 🔥 Activar tema y sincronizar extensiones
-php artisan ignite:sync || true
+php artisan package:discover || true
 php artisan igniter:util set theme --theme=tastyigniter-orange || true
 
 # Instalación o migraciones

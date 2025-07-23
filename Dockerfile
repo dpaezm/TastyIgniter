@@ -24,10 +24,12 @@ RUN npm run build || npm run prod
 # --- FASE 2: Producción ---
 FROM php:8.3-fpm
 
-apt-get install -y nginx \
-    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libonig-dev libxml2-dev libicu-dev \
+RUN apt-get update && apt-get install -y nginx \
+    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev \
+    libonig-dev libxml2-dev libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql exif intl zip mbstring xml
+    && docker-php-ext-install gd pdo pdo_mysql exif intl zip mbstring xml \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 

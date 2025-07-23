@@ -15,5 +15,5 @@ auth.json
 .env
 .env.backup
 .env.local
-themes/tastyigniter-orange/public/*
+
 !themes/tastyigniter-orange/public/.gitkeep

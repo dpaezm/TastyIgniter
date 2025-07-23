@@ -2,7 +2,7 @@
 set -e
 
 echo "--- ENTRYPOINT iniciado ---"
-echo "--- Variables de entorno cargadas ---"
+
 env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
 export CACHE_DRIVER=file
@@ -24,6 +24,10 @@ fi
 
 # Enlace a storage público
 [ ! -e public/storage ] && php artisan storage:link || true
+
+# 🔥 Activar tema y sincronizar extensiones
+php artisan ignite:sync || true
+php artisan igniter:util set theme --theme=tastyigniter-orange || true
 
 # Instalación o migraciones
 if ! php artisan migrate:status > /dev/null 2>&1; then

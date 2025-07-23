@@ -8,12 +8,12 @@ auth.json
 
 # Ignore all vendor files included by composer and the lock file 
 
-/vendor
-
-node_modules
-
-/public/vendor
+/vendor/
+/node_modules/
 /public/storage
-
-/storage/clockwork
-/_ide_helper.php
+/storage/*.key
+.env
+.env.backup
+.env.local
+themes/tastyigniter-orange/public/*
+!themes/tastyigniter-orange/public/.gitkeep

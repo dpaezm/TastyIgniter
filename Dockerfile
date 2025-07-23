@@ -26,6 +26,8 @@ FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y nginx \
     libpng16-16 libzip4 libjpeg62-turbo libfreetype6 libicu72 \
+    libonig5 libxml2 php8.3-mysql php8.3-mbstring php8.3-xml \
+    && docker-php-ext-install pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html

@@ -3,6 +3,7 @@
   "name": "Gridded Agency - orange",
   "description": "Custom theme Gr Ag",
   "author": "Diego Páez",
+  "locked": false,
   "version": "1.0.0",
   "tags": {
     "1.0.0": "Theme initialization"

@@ -10,7 +10,7 @@ services:
       APP_NAME: "Beautiful Parrilla"
       APP_ENV: local
       APP_DEBUG: true
-      APP_KEY: base64:MWMwZ...rellénala
+      APP_KEY: base64:qAkCg+XvezeeQPiexCYOvffUvCpKE5lVyJ+vqZfaZIw=
       DB_CONNECTION: mysql
       DB_HOST: mariadb
       DB_PORT: 3306

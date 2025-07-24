@@ -28,13 +28,8 @@ fi
 # Registrar extensiones
 php artisan package:discover || true
 
-# Activar tema (usando TI_THEME del entorno)
-if [ -n "$TI_THEME" ]; then
-  echo "--- Activando tema: $TI_THEME ---"
-  php artisan igniter:util set theme --theme="$TI_THEME" || true
-else
-  echo "⚠️  No se ha definido TI_THEME. No se aplicará ningún tema."
-fi
+# Activar tema personalizado
+php artisan igniter:util set theme --theme=$TI_THEME || true
 
 # Instalar si no está instalado, o aplicar migraciones
 if ! php artisan migrate:status > /dev/null 2>&1; then

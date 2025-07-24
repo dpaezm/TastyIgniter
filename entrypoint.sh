@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Esperar a que la base de datos esté lista
+echo "Esperando a que la base de datos esté disponible..."
+until mysqladmin ping -h"$DB_HOST" -u"$DB_USERNAME" -p"$DB_PASSWORD" --silent; do
+  sleep 2
+done
+echo "Base de datos disponible ✔"
+
 echo "--- ENTRYPOINT iniciado ---"
 env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 

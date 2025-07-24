@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Esperar a que la base de datos esté lista
+echo "Esperando a que la base de datos esté disponible..."
+until mysqladmin ping -h"$DB_HOST" -u"$DB_USERNAME" -p"$DB_PASSWORD" --silent; do
+  sleep 2
+done
+echo "Base de datos disponible ✔"
+
 echo "--- ENTRYPOINT iniciado ---"
 env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
@@ -28,9 +35,8 @@ fi
 # Registrar extensiones
 php artisan package:discover || true
 
-# Activar tema y publicar sus assets
-php artisan igniter:util set theme --theme=tastyigniter-orange || true
-php artisan igniter:theme-publish || true
+# Activar tema personalizado
+php artisan igniter:util set theme --theme=$TI_THEME || true
 
 # Instalar si no está instalado, o aplicar migraciones
 if ! php artisan migrate:status > /dev/null 2>&1; then

@@ -32,7 +32,6 @@ php artisan package:discover || true
 if [ -n "$TI_THEME" ]; then
   echo "--- Activando tema: $TI_THEME ---"
   php artisan igniter:util set theme --theme="$TI_THEME" || true
-  php artisan igniter:theme-publish || true
 else
   echo "⚠️  No se ha definido TI_THEME. No se aplicará ningún tema."
 fi

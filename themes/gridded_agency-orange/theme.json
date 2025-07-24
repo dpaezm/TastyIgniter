@@ -1,9 +1,8 @@
 {
   "code": "gridded_agency-orange",
-  "parent": null,
   "name": "Gridded Agency - orange",
-  "description": "Demonstration theme for TastyIgniter front-end",
-  "author": "TastyIgniter Dev Team",
+  "description": "Custom theme Gr Ag",
+  "author": "Diego Páez",
   "version": "1.0.0",
   "tags": {
     "1.0.0": "Theme initialization"

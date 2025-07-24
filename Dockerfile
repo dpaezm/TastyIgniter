@@ -19,9 +19,9 @@ COPY . .
 # Instala dependencias PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Build de assets del tema
-WORKDIR /var/www/html/themes/tastyigniter-orange
-RUN npm install && npm run build
+# Build de assets del tema gridded_agency-orange (si usa npm)
+WORKDIR /var/www/html/themes/gridded_agency-orange
+RUN [ -f package.json ] && npm install && npm run build || echo "No assets to build"
 
 # --- FASE 2: PRODUCCIÓN ---
 FROM php:8.3-fpm
@@ -36,8 +36,8 @@ WORKDIR /var/www/html
 # Copia código PHP y vendor desde builder
 COPY --from=builder /var/www/html .
 
-# Copia los assets generados por el tema
-COPY --from=builder /var/www/html/themes/tastyigniter-orange/public /var/www/html/public/themes/tastyigniter-orange
+# Copia assets del tema si existen
+COPY --from=builder /var/www/html/themes/gridded_agency-orange/public /var/www/html/public/themes/gridded_agency-orange
 
 # Configura PHP
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
@@ -51,7 +51,7 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Permisos necesarios
-RUN chown -R www-data:www-data storage bootstrap/cache themes
+RUN chown -R www-data:www-data storage bootstrap/cache themes extensions
 
 EXPOSE 80 9000
 

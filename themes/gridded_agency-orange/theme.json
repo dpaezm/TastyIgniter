@@ -1,0 +1,11 @@
+{
+  "code": "gridded-agency",
+  "parent": null,
+  "name": "Gridded Agency",
+  "description": "Demonstration theme for TastyIgniter front-end",
+  "author": "TastyIgniter Dev Team",
+  "version": "1.0.0",
+  "tags": {
+    "1.0.0": "Theme initialization"
+  }
+}

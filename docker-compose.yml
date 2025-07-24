@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  app:
+    image: tastyigniter-local
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      APP_NAME: "Beautiful Parrilla"
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_KEY: base64:MWMwZ...rellénala
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: default
+      DB_USERNAME: mariadb
+      DB_PASSWORD: OZ9fmav8kFBtO6ox1zL9WhCxkYdBuwwQ5aVz5x4A9b8txhNfuJtVoQXxHFG8WP
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+
+  db:
+    image: mariadb:11
+    container_name: mariadb # Asegúrate de usar este nombre si lo usas como DB_HOST
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: R90pCBgXvcwbvYEgESsiRZMYe4JjRZn9QSjZ3GT86Cz3A2eKTB3XqnrnXI
+      MYSQL_DATABASE: default
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: OZ9fmav8kFBtO6ox1zL9WhCxkYdBuwwQ5aVz5x4A9b8txhNfuJtVoQXxHFG8WP
+    ports:
+      - "3306:3306" # Opcional si quieres acceder desde fuera, por ejemplo desde tu Mac

@@ -31,5 +31,5 @@ services:
       MYSQL_DATABASE: default
       MYSQL_USER: mariadb
       MYSQL_PASSWORD: OZ9fmav8kFBtO6ox1zL9WhCxkYdBuwwQ5aVz5x4A9b8txhNfuJtVoQXxHFG8WP
-    ports:
-      - "3306:3306" # Opcional si quieres acceder desde fuera, por ejemplo desde tu Mac
+   # ports:
+    #  - "3306:3306" 

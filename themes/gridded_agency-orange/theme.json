@@ -1,7 +1,7 @@
 {
-  "code": "gridded-agency",
+  "code": "gridded_agency-orange",
   "parent": null,
-  "name": "Gridded Agency",
+  "name": "Gridded Agency - orange",
   "description": "Demonstration theme for TastyIgniter front-end",
   "author": "TastyIgniter Dev Team",
   "version": "1.0.0",

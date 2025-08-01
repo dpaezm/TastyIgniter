@@ -13,6 +13,10 @@ env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
 cd /var/www/html
 
+# Asegurar carpetas necesarias para Laravel
+mkdir -p storage/framework/{cache/data,sessions,views} && chown -R www-data:www-data storage
+
+
 # Crear .env si no existe
 if [ ! -f ".env" ]; then
   echo "--- .env no encontrado, creando uno nuevo ---"

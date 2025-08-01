@@ -12,34 +12,27 @@ Este repositorio está preparado para hacer despliegues automáticos en producci
 
 ## 🧪 Requisitos de despliegue
 
-Debes definir estas variables en Coolify o `.env`:
+Debes definir estas variables en Coolify o en el entorno `.env`:
 
 ```env
-
 APP_DEBUG=false
 APP_ENV=production
 APP_KEY=base64:
-APP_NAME=
-APP_URL=https:// .. gridded.agency
+APP_NAME=Beautiful Parrilla
+APP_URL=https://beautiful-app.gridded.agency
+
 DB_CONNECTION=mysql
 DB_DATABASE=default
-DB_HOST=asgs...
-DB_PASSWORD=...
-DB_PORT=3306
+DB_HOST=mariadb
 DB_USERNAME=mariadb
+DB_PASSWORD=***
+DB_PORT=3306
+
 LOG_CHANNEL=stderr
 QUEUE_CONNECTION=sync
+
 CACHE_DRIVER=database
 SESSION_DRIVER=database
 CACHE_DB_TABLE=ti_cache
 
-´´´
-
-
-
-```persistant storage
-
-/var/www/html/storage
-/var/www/html/extensions
-
-´´´
+TI_THEME=igniter-orange

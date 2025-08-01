@@ -13,11 +13,6 @@ env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
 cd /var/www/html
 
-# Crear carpetas necesarias si no existen
-mkdir -p storage/framework/{cache,data,sessions,testing,views} storage/logs
-chown -R www-data:www-data storage bootstrap/cache
-
-
 # Crear .env si no existe
 if [ ! -f ".env" ]; then
   echo "--- .env no encontrado, creando uno nuevo ---"
@@ -33,58 +28,32 @@ fi
 # Enlace de storage
 [ ! -e public/storage ] && php artisan storage:link || true
 
-# Crear tabla de cache y session si están activadas, ANTES DE CARGAR CUALQUIER COSA
-if [[ "$SESSION_DRIVER" == "database" ]]; then
-  php artisan session:table || true
-fi
-
-if [[ "$CACHE_DRIVER" == "database" ]]; then
-  php artisan cache:table || true
-fi
-
-# Ejecutar migraciones para asegurar que existen esas tablas
-php artisan migrate --force
-
 # Registrar extensiones
 php artisan package:discover || true
 
+# Crear tablas necesarias para drivers database antes de migraciones o install
+if [[ "$CACHE_DRIVER" == "database" ]]; then
+  echo "--- Generando tabla de caché ---"
+  php artisan cache:table || true
+fi
+
+if [[ "$SESSION_DRIVER" == "database" ]]; then
+  echo "--- Generando tabla de sesiones ---"
+  php artisan session:table || true
+fi
+
+# Aplicar migraciones necesarias
+echo "--- Ejecutando migraciones previas ---"
+php artisan migrate --force || true
+
+# Instalar si no está instalado
+if ! php artisan migrate:status > /dev/null 2>&1; then
+  echo "--- Base de datos vacía. Ejecutando instalación inicial ---"
+  php artisan igniter:install --no-interaction
+fi
+
 # Activar tema personalizado
 php artisan igniter:util set theme --theme=$TI_THEME || true
-
-
-# Instalar si no está instalado, o aplicar migraciones
-if ! php artisan migrate:status > /dev/null 2>&1; then
-  echo "--- Base de datos vacía. Ejecutando instalación por primera vez... ---"
-  php artisan igniter:install --no-interaction
-
-  # Crear tablas necesarias para sesiones/cache si están en modo database
-  if [[ "$SESSION_DRIVER" == "database" ]]; then
-    echo "--- Migrando tabla de sesiones (SESSION_DRIVER=database) ---"
-    php artisan session:table || true
-  fi
-
-  if [[ "$CACHE_DRIVER" == "database" ]]; then
-    echo "--- Migrando tabla de caché (CACHE_DRIVER=database) ---"
-    php artisan cache:table || true
-  fi
-
-  php artisan migrate --force
-else
-  echo "--- Aplicando migraciones pendientes ---"
-  php artisan migrate --force
-
-  if [[ "$SESSION_DRIVER" == "database" ]]; then
-    echo "--- Migrando tabla de sesiones (SESSION_DRIVER=database) ---"
-    php artisan session:table || true
-    php artisan migrate --force
-  fi
-
-  if [[ "$CACHE_DRIVER" == "database" ]]; then
-    echo "--- Migrando tabla de caché (CACHE_DRIVER=database) ---"
-    php artisan cache:table || true
-    php artisan migrate --force
-  fi
-fi
 
 # Limpieza de cachés
 php artisan config:clear

@@ -27,7 +27,8 @@ RUN [ -f package.json ] && npm install && npm run build || echo "No assets to bu
 FROM php:8.3-fpm
 
 # Instala nginx y librerías necesarias (sin compilación)
-RUN apt-get update && apt-get install -y nginx \
+RUN apt-get update && apt-get install -y \
+    nginx mariadb-client \       # ← aquí la diferencia
     libpng16-16 libzip4 libjpeg62-turbo libfreetype6 libicu72 \
     && rm -rf /var/lib/apt/lists/*
 

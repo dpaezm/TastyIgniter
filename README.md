@@ -33,9 +33,13 @@ CACHE_DRIVER=database
 SESSION_DRIVER=database
 CACHE_DB_TABLE=ti_cache
 
+´´´
+
+
 
 ```persistant storage
 
-/var/www/html/storage/app/public
-/var/www/html/themes
+/var/www/html/storage
 /var/www/html/extensions
+
+´´´

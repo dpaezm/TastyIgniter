@@ -13,6 +13,11 @@ env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
 cd /var/www/html
 
+# Crear carpetas necesarias si no existen
+mkdir -p storage/framework/{cache,data,sessions,testing,views} storage/logs
+chown -R www-data:www-data storage bootstrap/cache
+
+
 # Crear .env si no existe
 if [ ! -f ".env" ]; then
   echo "--- .env no encontrado, creando uno nuevo ---"

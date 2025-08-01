@@ -11,10 +11,6 @@ echo "Base de datos disponible ✔"
 echo "--- ENTRYPOINT iniciado ---"
 env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
-# Configura drivers
-export CACHE_DRIVER=file
-export SESSION_DRIVER=file
-
 cd /var/www/html
 
 # Crear .env si no existe
@@ -44,6 +40,19 @@ if ! php artisan migrate:status > /dev/null 2>&1; then
   php artisan igniter:install --no-interaction
 else
   echo "--- Aplicando migraciones pendientes ---"
+  php artisan migrate --force
+fi
+
+# Migrar tabla de sesiones y cache si se usa database
+if [[ "$SESSION_DRIVER" == "database" ]]; then
+  echo "--- Migrando tabla de sesiones (SESSION_DRIVER=database) ---"
+  php artisan session:table || true
+  php artisan migrate --force
+fi
+
+if [[ "$CACHE_DRIVER" == "database" ]]; then
+  echo "--- Migrando tabla de caché (CACHE_DRIVER=database) ---"
+  php artisan cache:table || true
   php artisan migrate --force
 fi
 

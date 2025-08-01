@@ -26,15 +26,16 @@ RUN [ -f package.json ] && npm install && npm run build || echo "No assets to bu
 # --- FASE 2: PRODUCCIÓN ---
 FROM php:8.3-fpm
 
-# Instala nginx, cliente MariaDB y librerías de imagen
+# Instala nginx, cliente MariaDB y librerías de tiempo de ejecución
 RUN apt-get update \
  && apt-get install -y \
       nginx \
-      mariadb-client \        # cliente CLI
+      mariadb-client \
       libpng16-16 libzip4 libjpeg62-turbo libfreetype6 libicu72 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
+
 
 # Copia código PHP y vendor desde builder
 COPY --from=builder /var/www/html .

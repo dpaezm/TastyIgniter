@@ -1,18 +1,34 @@
-<p align="center"><a href="https://tastyigniter" target="_blank"><img src="https://tastyigniter.com/images/logos/logo-padded.png" width="400"></a></p>
+# TastyIgniter – Deploy automático con tema Orange
 
-[TastyIgniter](https://tastyigniter.com/) provides a professional and reliable platform for restaurants wanting to offer
-online food ordering and table reservation to their customers.
+Este repositorio está preparado para hacer despliegues automáticos en producción mediante Coolify.
 
-![screenshot](https://tastyigniter.com/images/mockups/v4/Menus.png)
+## 🚀 ¿Qué incluye?
+- TastyIgniter + Laravel 10 + PHP 8.3
+- Tema `ti-theme-orange` integrado por Composer
+- NGINX y PHP-FPM listos para producción
+- Migraciones automáticas con Artisan
+- Publicación de assets del tema
+- Activación automática del tema con `TI_THEME`
 
-### Documentation
-The best place to learn TastyIgniter is by reading the [documentation](https://tastyigniter.com/docs)
+## 🧪 Requisitos de despliegue
 
-### Installation
-Please read the [Installation Guide](https://tastyigniter.com/docs/installation) for more information.
+Debes definir estas variables en Coolify o `.env`:
 
-### Questions
-For questions and support please use the [Community Forum](https://forum.tastyigniter.com) or [Join us on Discord](https://tastyigniter.com/discord). 
+```env
 
-### Issues
-Please report bugs using the [GitHub issue tracker](https://github.com/tastyigniter/TastyIgniter/issues)
+APP_DEBUG=false
+APP_ENV=production
+APP_KEY=base64:
+APP_NAME=
+APP_URL=https:// .. gridded.agency
+DB_CONNECTION=mysql
+DB_DATABASE=default
+DB_HOST=asgs...
+DB_PASSWORD=...
+DB_PORT=3306
+DB_USERNAME=mariadb
+LOG_CHANNEL=stderr
+QUEUE_CONNECTION=sync
+CACHE_DRIVER=database
+SESSION_DRIVER=database
+CACHE_DB_TABLE=ti_cache

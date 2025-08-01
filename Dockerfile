@@ -41,7 +41,8 @@ WORKDIR /var/www/html
 COPY --from=builder /var/www/html .
 
 # Copia assets del tema si existen
-# COPY --from=builder /var/www/html/themes/gridded_agency-orange/public /var/www/html/public/themes/gridded_agency-orange
+COPY --from=builder /var/www/html/themes/gridded_agency-orange/public /var/www/html/public/vendor/igniter-orange
+
 
 # Configura PHP
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/

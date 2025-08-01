@@ -28,11 +28,24 @@ fi
 # Enlace de storage
 [ ! -e public/storage ] && php artisan storage:link || true
 
+# Crear tabla de cache y session si están activadas, ANTES DE CARGAR CUALQUIER COSA
+if [[ "$SESSION_DRIVER" == "database" ]]; then
+  php artisan session:table || true
+fi
+
+if [[ "$CACHE_DRIVER" == "database" ]]; then
+  php artisan cache:table || true
+fi
+
+# Ejecutar migraciones para asegurar que existen esas tablas
+php artisan migrate --force
+
 # Registrar extensiones
 php artisan package:discover || true
 
 # Activar tema personalizado
 php artisan igniter:util set theme --theme=$TI_THEME || true
+
 
 # Instalar si no está instalado, o aplicar migraciones
 if ! php artisan migrate:status > /dev/null 2>&1; then

@@ -38,22 +38,34 @@ php artisan igniter:util set theme --theme=$TI_THEME || true
 if ! php artisan migrate:status > /dev/null 2>&1; then
   echo "--- Base de datos vacía. Ejecutando instalación por primera vez... ---"
   php artisan igniter:install --no-interaction
+
+  # Crear tablas necesarias para sesiones/cache si están en modo database
+  if [[ "$SESSION_DRIVER" == "database" ]]; then
+    echo "--- Migrando tabla de sesiones (SESSION_DRIVER=database) ---"
+    php artisan session:table || true
+  fi
+
+  if [[ "$CACHE_DRIVER" == "database" ]]; then
+    echo "--- Migrando tabla de caché (CACHE_DRIVER=database) ---"
+    php artisan cache:table || true
+  fi
+
+  php artisan migrate --force
 else
   echo "--- Aplicando migraciones pendientes ---"
   php artisan migrate --force
-fi
 
-# Migrar tabla de sesiones y cache si se usa database
-if [[ "$SESSION_DRIVER" == "database" ]]; then
-  echo "--- Migrando tabla de sesiones (SESSION_DRIVER=database) ---"
-  php artisan session:table || true
-  php artisan migrate --force
-fi
+  if [[ "$SESSION_DRIVER" == "database" ]]; then
+    echo "--- Migrando tabla de sesiones (SESSION_DRIVER=database) ---"
+    php artisan session:table || true
+    php artisan migrate --force
+  fi
 
-if [[ "$CACHE_DRIVER" == "database" ]]; then
-  echo "--- Migrando tabla de caché (CACHE_DRIVER=database) ---"
-  php artisan cache:table || true
-  php artisan migrate --force
+  if [[ "$CACHE_DRIVER" == "database" ]]; then
+    echo "--- Migrando tabla de caché (CACHE_DRIVER=database) ---"
+    php artisan cache:table || true
+    php artisan migrate --force
+  fi
 fi
 
 # Limpieza de cachés

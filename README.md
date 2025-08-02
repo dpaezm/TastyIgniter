@@ -112,9 +112,13 @@ php artisan route:list | grep api
 
 ---
 
-### 🛑 No uses Passport
+# Cambia el propietario de todos los archivos al usuario y grupo del servidor web.
+# Esto soluciona el problema de composer.json y de la Carté Key.
+Dentro del contenedor: 
+chown -R www-data:www-data /var/www/html
 
-La extensión API oficial ya implementa Laravel Sanctum internamente. No es necesario instalar `laravel/passport` ni configurar clientes OAuth.
-
+# Establece los permisos correctos para los directorios de almacenamiento y caché,
+# una práctica estándar de Laravel/TastyIgniter.
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 ````
 

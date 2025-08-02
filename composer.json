@@ -36,6 +36,7 @@
   "require": {
     "php": "^8.3",
     "laravel/framework": "^11.0",
+    "laravel/passport": "^13.0",
     "laravel/tinker": "^2.10.1",
     "tastyigniter/core": "^4.0",
     "tastyigniter/ti-ext-api": "^4.0",
@@ -87,6 +88,9 @@
   "config": {
     "optimize-autoloader": true,
     "preferred-install": "dist",
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
   }
 }

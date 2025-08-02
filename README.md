@@ -1,6 +1,3 @@
-# TastyIgniter – Deploy automático con tema Orange
-
-
 ````markdown
 # TastyIgniter – Deploy automático con tema Orange
 
@@ -43,7 +40,7 @@ SESSION_DRIVER=database
 CACHE_DB_TABLE=ti_cache
 
 TI_THEME=igniter-orange
-````
+```
 
 > ℹ️ `TI_THEME` se usa para activar automáticamente el tema tras la instalación. Puedes cambiarlo si usas otro.
 
@@ -75,7 +72,65 @@ El script `entrypoint.sh` se encarga de:
 
 ---
 
-Si quieres añadir futuras secciones como copias de seguridad, staging o despliegue multientorno, puedo ayudarte a extender este README. ¿Quieres añadir algo más ahora?
+## 🧩 Instalación opcional: API REST (`ti-ext-api`)
 
+Si quieres exponer una API para acceder a pedidos, menús, clientes, etc., puedes instalar la extensión oficial `tastyigniter/ti-ext-api`.
+
+### 1. Añadir Passport y la extensión API por Composer
+
+```bash
+composer require laravel/passport
+composer require tastyigniter/ti-ext-api -W
 ```
+
+### 2. Registrar el service provider en `config/app.php`
+
+Abre `config/app.php` y añade al final del array `'providers'`:
+
+```php
+Laravel\Passport\PassportServiceProvider::class,
 ```
+
+### 3. Commit y redeploy
+
+```bash
+git add composer.json composer.lock config/app.php
+git commit -m "Instalar API y Passport para TastyIgniter"
+git push
+```
+
+En Coolify, haz redeploy.
+
+### 4. Verifica en consola
+
+```bash
+php artisan passport:install --no-interaction
+php artisan install:api --no-interaction
+php artisan route:list | grep api
+```
+
+---
+
+### 5. Uso desde Postman o n8n
+
+1. Genera un `access_token`:
+
+```bash
+curl -X POST https://tu-dominio.com/api/token \
+  -d "grant_type=personal_access" \
+  -d "client_id=CLIENT_ID" \
+  -d "client_secret=CLIENT_SECRET" \
+  -d "scope=*"
+```
+
+2. Llama a la API:
+
+```bash
+curl -H "Authorization: Bearer TU_ACCESS_TOKEN" \
+     https://tu-dominio.com/api/menus
+```
+
+---
+
+````
+

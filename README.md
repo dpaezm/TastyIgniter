@@ -1,3 +1,5 @@
+Aquí tienes el README completo **actualizado** con la sección de API corregida, **eliminando todo lo relacionado con Passport** y explicando cómo usar `igniter:api-token` como recomienda la documentación oficial:
+
 ````markdown
 # TastyIgniter – Deploy automático con tema Orange
 
@@ -72,65 +74,48 @@ El script `entrypoint.sh` se encarga de:
 
 ---
 
-## 🧩 Instalación opcional: API REST (`ti-ext-api`)
+## 🧩 Acceso a la API REST (con `ti-ext-api`)
 
-Si quieres exponer una API para acceder a pedidos, menús, clientes, etc., puedes instalar la extensión oficial `tastyigniter/ti-ext-api`.
+Este proyecto incluye la extensión oficial `tastyigniter/ti-ext-api`, que expone una API REST para acceder a pedidos, menús, reservas, clientes, etc.
 
-### 1. Añadir Passport y la extensión API por Composer
+### Cómo generar un token de acceso
 
-```bash
-composer require laravel/passport
-composer require tastyigniter/ti-ext-api -W
-```
-
-### 2. Registrar el service provider en `config/app.php`
-
-Abre `config/app.php` y añade al final del array `'providers'`:
-
-```php
-Laravel\Passport\PassportServiceProvider::class,
-```
-
-### 3. Commit y redeploy
+Para autenticar peticiones desde Postman o herramientas como n8n, genera un token con el siguiente comando:
 
 ```bash
-git add composer.json composer.lock config/app.php
-git commit -m "Instalar API y Passport para TastyIgniter"
-git push
+php artisan igniter:api-token --name=postman --email=diego@gridded.agency --admin
 ```
 
-En Coolify, haz redeploy.
+> Reemplaza el email por el de un usuario Staff registrado (ver en *Manage > Staff Members*).
 
-### 4. Verifica en consola
+Este comando devuelve un `access_token` listo para usar.
+
+### Cómo usar el token
+
+En tus llamadas HTTP añade el token en el header `Authorization`:
+
+```http
+Authorization: Bearer TU_ACCESS_TOKEN
+```
+
+Ejemplo con `curl`:
 
 ```bash
-php artisan passport:install --no-interaction
-php artisan install:api --no-interaction
+curl -H "Authorization: Bearer 1|ABCDEF..." \
+     https://tu-dominio.com/api/menus
+```
+
+Puedes consultar todos los endpoints disponibles con:
+
+```bash
 php artisan route:list | grep api
 ```
 
 ---
 
-### 5. Uso desde Postman o n8n
+### 🛑 No uses Passport
 
-1. Genera un `access_token`:
-
-```bash
-curl -X POST https://tu-dominio.com/api/token \
-  -d "grant_type=personal_access" \
-  -d "client_id=CLIENT_ID" \
-  -d "client_secret=CLIENT_SECRET" \
-  -d "scope=*"
-```
-
-2. Llama a la API:
-
-```bash
-curl -H "Authorization: Bearer TU_ACCESS_TOKEN" \
-     https://tu-dominio.com/api/menus
-```
-
----
+La extensión API oficial ya implementa Laravel Sanctum internamente. No es necesario instalar `laravel/passport` ni configurar clientes OAuth.
 
 ````
 

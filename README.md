@@ -1,4 +1,3 @@
-Aquí tienes el README completo **actualizado** con la sección de API corregida, **eliminando todo lo relacionado con Passport** y explicando cómo usar `igniter:api-token` como recomienda la documentación oficial:
 
 ````markdown
 # TastyIgniter – Deploy automático con tema Orange

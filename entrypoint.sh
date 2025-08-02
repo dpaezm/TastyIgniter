@@ -56,6 +56,14 @@ if ! php artisan migrate:status > /dev/null 2>&1; then
   php artisan igniter:install --no-interaction
 fi
 
+# Instalar extensión API si no existe el cliente
+if ! php artisan passport:client --personal --name="Default" --no-interaction 2>&1 | grep -q "Client secret"; then
+  echo "--- Instalando sistema API ---"
+  php artisan install:api --no-interaction
+else
+  echo "--- API ya instalada, omitiendo install:api ---"
+fi
+
 # Activar tema personalizado
 php artisan igniter:util set theme --theme=$TI_THEME || true
 

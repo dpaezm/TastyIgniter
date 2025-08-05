@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "025410c7675bb589c3ccb986fddab308",
+    "content-hash": "6fa47f4e75296ca5b270c5f1b7dcb194",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -11198,16 +11198,16 @@
         },
         {
             "name": "tastyigniter/core",
-            "version": "v4.0.12",
+            "version": "v4.0.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tastyigniter/core.git",
-                "reference": "4a4c319184899fdb772789168482e27694acb5e1"
+                "reference": "022ccb1d1a9c1a4052f13557fa932ca29eb8c116"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tastyigniter/core/zipball/4a4c319184899fdb772789168482e27694acb5e1",
-                "reference": "4a4c319184899fdb772789168482e27694acb5e1",
+                "url": "https://api.github.com/repos/tastyigniter/core/zipball/022ccb1d1a9c1a4052f13557fa932ca29eb8c116",
+                "reference": "022ccb1d1a9c1a4052f13557fa932ca29eb8c116",
                 "shasum": ""
             },
             "require": {
@@ -11298,7 +11298,7 @@
             ],
             "support": {
                 "issues": "https://github.com/tastyigniter/core/issues",
-                "source": "https://github.com/tastyigniter/core/tree/v4.0.12"
+                "source": "https://github.com/tastyigniter/core/tree/v4.0.13"
             },
             "funding": [
                 {
@@ -11310,7 +11310,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2025-07-26T10:00:18+00:00"
+            "time": "2025-08-04T21:49:54+00:00"
         },
         {
             "name": "tastyigniter/ti-ext-api",
@@ -12146,17 +12146,17 @@
         },
         {
             "name": "tastyigniter/ti-ext-pages",
-            "version": "v4.0.7",
+            "version": "v4.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tastyigniter/ti-ext-pages.git",
-                "reference": "64e45993910e348530e17f735404225a618dc82e"
+                "reference": "f76188173a910b84fd94d9b438ac8a2d956cccb8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://satis.tastyigniter.com/dist/tastyigniter/ti-ext-pages/tastyigniter-ti-ext-pages-64e45993910e348530e17f735404225a618dc82e-zip-b34392.zip",
-                "reference": "64e45993910e348530e17f735404225a618dc82e",
-                "shasum": "6f1028957813d11656506174c7db8ed9e2617e08"
+                "url": "https://satis.tastyigniter.com/dist/tastyigniter/ti-ext-pages/tastyigniter-ti-ext-pages-f76188173a910b84fd94d9b438ac8a2d956cccb8-zip-c60e55.zip",
+                "reference": "f76188173a910b84fd94d9b438ac8a2d956cccb8",
+                "shasum": "c9a75bc43cf9bafd7d6f67ccd2c2ef3c8809c161"
             },
             "require": {
                 "tastyigniter/core": "^v4.0"
@@ -12241,7 +12241,7 @@
             ],
             "description": "Provides static pages and navigation menus for your TastyIgniter application.",
             "support": {
-                "source": "https://github.com/tastyigniter/ti-ext-pages/tree/v4.0.7",
+                "source": "https://github.com/tastyigniter/ti-ext-pages/tree/v4.0.8",
                 "issues": "https://github.com/tastyigniter/ti-ext-pages/issues"
             },
             "funding": [
@@ -12254,7 +12254,7 @@
                     "url": "https://opencollective.com/tastyigniter"
                 }
             ],
-            "time": "2025-07-22T17:17:25+00:00"
+            "time": "2025-08-04T16:38:39+00:00"
         },
         {
             "name": "tastyigniter/ti-ext-payregister",

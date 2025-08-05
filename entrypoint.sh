@@ -16,7 +16,6 @@ cd /var/www/html
 # Asegurar carpetas necesarias para Laravel
 mkdir -p storage/framework/{cache/data,sessions,views} && chown -R www-data:www-data storage
 
-
 # Crear .env si no existe
 if [ ! -f ".env" ]; then
   echo "--- .env no encontrado, creando uno nuevo ---"
@@ -49,6 +48,10 @@ fi
 # Aplicar migraciones necesarias
 echo "--- Ejecutando migraciones previas ---"
 php artisan migrate --force || true
+
+# Ejecutar migraciones de extensiones TastyIgniter
+echo "--- Ejecutando igniter:up ---"
+php artisan igniter:up --force || true
 
 # Instalar si no está instalado
 if ! php artisan migrate:status > /dev/null 2>&1; then

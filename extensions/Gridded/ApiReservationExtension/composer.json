@@ -1,32 +1,24 @@
 {
-  "name": "gridded/api-reservation-extension",
-  "description": "Extensión TastyIgniter para crear reservas vía API con asignación automática de mesa.",
-  "type": "tastyigniter-extension",
-  "version": "4.0.0",
-  "license": "MIT",
-
-  // 🔑  Estas dos claves deben estar AQUÍ
-  "code": "gridded.apireservationextension",
-  "namespace": "Gridded\\ApiReservationExtension",
-
-  "authors": [
-    {
-      "name": "Diego Páez",
-      "email": "diego@gridded.agency"
+    "name": "gridded/api-reservation-extension",
+    "description": "Extension TastyIgniter para crear reservas via API con asignacion automatica de mesa",
+    "type": "tastyigniter-extension",
+    "version": "1.0.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Diego Paez",
+            "email": "diego@gridded.agency"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Gridded\\ApiReservationExtension\\": "" // <-- LA CORRECCIÓN CLAVE
+        }
+    },
+    "extra": {
+        "tastyigniter-extension": { // <-- Pequeño ajuste estructural
+            "code": "Gridded.ApiReservationExtension",
+            "name": "API Reservation Extension"
+        }
     }
-  ],
-
-  "require": {
-    "php": "^8.1 || ^8.2 || ^8.3",
-    "tastyigniter/flame": "^3.0"
-  },
-
-  "autoload": {
-    "psr-4": {
-      "Gridded\\ApiReservationExtension\\": "extensions/Gridded/ApiReservationExtension/"
-    }
-  },
-
-  "minimum-stability": "stable",
-  "prefer-stable": true
 }

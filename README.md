@@ -1,75 +1,4 @@
-
-````markdown
-# TastyIgniter – Deploy automático con tema Orange
-
-Este repositorio está preparado para hacer despliegues automáticos en producción mediante [Coolify](https://coolify.io/).
-
-## 🚀 ¿Qué incluye?
-
-- TastyIgniter + Laravel 10 + PHP 8.3
-- Tema `ti-theme-orange` integrado por Composer
-- NGINX y PHP-FPM listos para producción
-- Migraciones automáticas con Artisan
-- Publicación de assets del tema
-- Activación automática del tema con `TI_THEME`
-- `entrypoint.sh` personalizado que gestiona APP_KEY, migraciones, instalación inicial y activación del tema
-- No requiere temas o extensiones locales: todo gestionado por Composer
-
-## 🧪 Requisitos de despliegue
-
-Debes definir estas variables en Coolify (o en un archivo `.env` si haces despliegue manual):
-
-```env
-APP_DEBUG=false
-APP_ENV=production
-APP_KEY=base64:            # Puedes dejarlo vacío y se generará uno automáticamente si el sistema no está instalado
-APP_NAME=Beautiful Parrilla
-APP_URL=https://beautiful-app.gridded.agency
-
-DB_CONNECTION=mysql
-DB_DATABASE=default
-DB_HOST=mariadb
-DB_USERNAME=mariadb
-DB_PASSWORD=****
-DB_PORT=3306
-
-LOG_CHANNEL=stderr
-QUEUE_CONNECTION=sync
-
-CACHE_DRIVER=database
-SESSION_DRIVER=database
-CACHE_DB_TABLE=ti_cache
-
-TI_THEME=igniter-orange
-```
-
-> ℹ️ `TI_THEME` se usa para activar automáticamente el tema tras la instalación. Puedes cambiarlo si usas otro.
-
-## 💾 Volúmenes persistentes
-
-En la sección **Persistent Storage** de Coolify, define estos directorios para evitar pérdida de datos al actualizar:
-
-```plaintext
-/var/www/html/storage
-/var/www/html/extensions
-# /var/www/html/themes ← opcional si los temas se editan desde el panel
-```
-
-## 📝 Cómo funciona el entrypoint
-
-El script `entrypoint.sh` se encarga de:
-
-1. Esperar a que la base de datos esté lista
-2. Crear `.env` si no existe
-3. Añadir `APP_KEY` si no está presente
-4. Crear enlace `public/storage`
-5. Descubrir paquetes y extensiones (`package:discover`)
-6. Activar el tema definido en `TI_THEME`
-7. Ejecutar instalación inicial (`igniter:install`) si la base de datos está vacía
-8. Ejecutar migraciones pendientes
-9. Crear tablas `sessions` y `cache` si usas `SESSION_DRIVER=database` o `CACHE_DRIVER=database`
-10. Limpiar cachés (`config`, `route`, `view`)
-11. Iniciar `php-fpm` y `nginx`
+Perfecto, aquí tienes la versión actualizada del README con la sección adicional sobre la API REST:
 
 ---
 
@@ -85,7 +14,7 @@ Para autenticar peticiones desde Postman o herramientas como n8n, genera un toke
 php artisan igniter:api-token --name=postman --email=diego@gridded.agency --admin
 ```
 
-> Reemplaza el email por el de un usuario Staff registrado (ver en *Manage > Staff Members*).
+> Reemplaza el email por el de un usuario Staff registrado (ver en _Manage > Staff Members_).
 
 Este comando devuelve un `access_token` listo para usar.
 
@@ -111,14 +40,3 @@ php artisan route:list | grep api
 ```
 
 ---
-
-# Cambia el propietario de todos los archivos al usuario y grupo del servidor web.
-# Esto soluciona el problema de composer.json y de la Carté Key.
-Dentro del contenedor: 
-chown -R www-data:www-data /var/www/html
-
-# Establece los permisos correctos para los directorios de almacenamiento y caché,
-# una práctica estándar de Laravel/TastyIgniter.
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-````
-

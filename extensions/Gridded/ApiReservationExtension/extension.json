@@ -1,9 +1,0 @@
-{
-  "name": "gridded.apireservationextension",
-  "code": "gridded.apireservationextension",
-  "type": "extension",
-  "version": "1.0.0",
-  "description": "API personalizada para reservas",
-  "author": "Diego Páez",
-  "namespace": "Gridded\\ApiReservationExtension"
-}

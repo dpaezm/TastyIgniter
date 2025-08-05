@@ -3,6 +3,7 @@
 namespace Gridded\ApiReservationExtension;
 
 use System\Classes\BaseExtension;
+use System\Classes\RouteRegistrar;
 
 class Extension extends BaseExtension
 {
@@ -16,6 +17,6 @@ class Extension extends BaseExtension
 
     public function registerRoutes()
     {
-        \System\Classes\RouteRegistrar::instance()->registerRoutesFromFile(__DIR__.'/routes.php');
+        RouteRegistrar::instance()->registerRoutesFromFile(__DIR__.'/routes.php');
     }
 }

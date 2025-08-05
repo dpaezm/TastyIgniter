@@ -1,8 +1,15 @@
 {
   "name": "gridded/api-reservation-extension",
-  "description": "Extiende el endpoint de reservas para asignar mesa y confirmar automáticamente.",
+  "description": "Extensión TastyIgniter para crear reservas vía API con asignación automática de mesa y estado confirmado.",
   "type": "tastyigniter-extension",
-  "version": "4.x-dev",
+  "version": "4.0.0",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Diego Páez",
+      "email": "diego@gridded.agency"
+    }
+  ],
   "require": {
     "php": "^8.1 || ^8.2 || ^8.3",
     "tastyigniter/flame": "^3.0"
@@ -15,5 +22,7 @@
   "extra": {
     "code": "gridded.apireservationextension",
     "namespace": "Gridded\\ApiReservationExtension"
-  }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }

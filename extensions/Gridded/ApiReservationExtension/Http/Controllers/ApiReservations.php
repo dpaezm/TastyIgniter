@@ -2,36 +2,37 @@
 
 namespace Gridded\ApiReservationExtension\Http\Controllers;
 
-use Igniter\Api\Classes\ApiController;
+use Illuminate\Routing\Controller;
+use Illuminate\Http\Request;
 use Igniter\Reservation\Classes\BookingManager;
 
-class ApiReservations extends ApiController
+class ApiReservationController extends Controller
 {
-    public $implement = [
-        'Igniter\Api\Actions\RestController',
-    ];
-
-    public $checkToken = true;
-
-    public $guard = 'api';
-
-    protected $defaultSort = ['reserve_id', 'desc'];
-
-    public function create()
+    public function store(Request $request)
     {
-        $data = post(); // obtiene el body JSON del request
+        $attributes = $request->validate([
+            'location_id' => 'required|integer',
+            'guest' => 'required|integer|min:1',
+            'first_name' => 'required|string',
+            'last_name' => 'nullable|string',
+            'email' => 'required|email',
+            'telephone' => 'required|string',
+            'sdateTime' => 'required|string',
+            'comment' => 'nullable|string',
+        ]);
 
         $bookingManager = resolve(BookingManager::class);
+
         $reservation = $bookingManager->loadReservation();
-        $reservation = $bookingManager->saveReservation($reservation, $data);
+        $reservation = $bookingManager->saveReservation($reservation, $attributes);
 
-        // Asignar mesa automáticamente
         $reservation->assignTable();
-
-        // Confirmar automáticamente
         $reservation->status = 'confirmed';
         $reservation->save();
 
-        return $this->createResponse($reservation);
+        return response()->json([
+            'success' => true,
+            'reservation' => $reservation,
+        ]);
     }
 }

@@ -2,21 +2,17 @@
 
 namespace Gridded\ApiReservationExtension;
 
-use System\Classes\BaseExtension;
-use System\Classes\RouteRegistrar;
+use Igniter\System\Classes\BaseExtension;      // ⬅️  CORREGIDO
+use Igniter\System\Classes\RouteRegistrar;     // ⬅️  CORREGIDO
 
 class Extension extends BaseExtension
 {
-    public function register()
-    {
-    }
-
-    public function boot()
-    {
-    }
+    public function register() {}
+    public function boot() {}
 
     public function registerRoutes()
     {
-          RouteRegistrar::instance()->registerRoutesFromFile(__DIR__.'/routes.php');
+        RouteRegistrar::instance()
+            ->registerRoutesFromFile(__DIR__.'/routes.php');
     }
 }

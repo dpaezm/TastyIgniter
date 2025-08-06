@@ -12,9 +12,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer require tastyigniter/ti-theme-orange -W && \
-    composer install --no-dev --optimize-autoloader && \
+RUN composer install --no-dev --optimize-autoloader && \
     php artisan vendor:publish --tag=laravel-assets --ansi --force
+
 
 RUN chown -R www-data:www-data /var/www/html
 

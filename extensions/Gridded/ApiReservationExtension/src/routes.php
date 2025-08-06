@@ -3,6 +3,4 @@
 use Illuminate\Support\Facades\Route;
 use Gridded\ApiReservationExtension\Http\Controllers\ApiReservationController;
 
-Route::prefix('api/reservations')->group(function () {
-    Route::post('/', [ApiReservationController::class, 'store']);
-});
+Route::post('/api/reservations/create-custom', [ApiReservationController::class, 'store']);

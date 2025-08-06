@@ -10,7 +10,7 @@ class Extension extends BaseExtension
     public function registerApiResources()
     {
         return [
-            'reservations' => [
+            'custom-reservations' => [
                 'controller' => ReservationsController::class,
                 'only' => ['store'],
             ],

@@ -34,7 +34,10 @@
     },
     {
       "type": "path",
-      "url": "extensions/Gridded/apireservationextension"
+      "url": "extensions/gridded/apireservationextension",
+      "options": {
+        "symlink": false
+      }
     }
   ],
   "require": {

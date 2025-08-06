@@ -12,7 +12,7 @@ class ApiReservationController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. Validar la entrada con los nombres de campo correctos
+        // 1. Validar la entrada (sigue siendo importante)
         $rules = [
             'location_id'   => ['required', 'integer'],
             'guest_num'     => ['required', 'integer', 'min:1'],
@@ -29,24 +29,18 @@ class ApiReservationController extends Controller
 
         $bookingManager = resolve(BookingManager::class);
 
-        // 2. Crear un objeto de reserva en memoria
-        $reservation = $bookingManager->loadReservation();
-        $reservation->fill($validatedData);
-
-        // 3. Forzar la asignación de una mesa (Paso de disponibilidad)
-        $tableAssigned = $bookingManager->assignReservationTable($reservation);
-
-        // 4. Si no hay mesa, lanzar un error claro
-        if (!$tableAssigned) {
-            throw ValidationException::withMessages([
-                'reserve_time' => 'No tables available for the selected date and time.',
-            ]);
+        try {
+            // 2. Simplemente intentamos guardar. Nuestro evento se encargará del resto.
+            $reservation = $bookingManager->saveReservation(
+                $bookingManager->loadReservation(),
+                $validatedData
+            );
+        } catch (ValidationException $e) {
+            // Si nuestro evento lanzó una excepción, la atrapamos y la devolvemos.
+            throw $e;
         }
 
-        // 5. Solo ahora, guardar la reserva. El estado se aplicará automáticamente.
-        $bookingManager->saveReservation($reservation, $validatedData);
-
-        // 6. Devolver la respuesta final
+        // 3. Devolver la respuesta de éxito
         return response()->json([
             'success'     => true,
             'message'     => 'Reservation created and confirmed successfully.',

@@ -7,12 +7,14 @@ use Igniter\System\Classes\BaseExtension;
 
 class Extension extends BaseExtension
 {
-    public function registerApiResources()
+    public function registerApiResources(): array
     {
         return [
             'custom-reservations' => [
-                'controller' => ReservationsController::class,
-                'only' => ['store'],
+                'name'        => 'Custom Reservations',           // ✔ obligatorio
+                'description' => 'Crear reservas vía API',        // opcional
+                'controller'  => ReservationsController::class,   // ✔ obligatorio
+                'actions'     => ['store'],                       // usa “actions”, no “only”
             ],
         ];
     }

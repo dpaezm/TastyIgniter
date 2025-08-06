@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "tastyigniter/flame": "^3.0"
+    "tastyigniter/flame": "^4.0"
   },
   "autoload": {
     "psr-4": {

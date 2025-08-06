@@ -2,13 +2,22 @@
 
 namespace Gridded\ApiReservationExtension\ApiResources\Reservations;
 
-use League\Fractal\TransformerAbstract;
-use Igniter\Reservation\Models\Reservation;
+use Igniter\Api\Classes\ApiController;
+use Igniter\Api\Http\Actions\RestController;
+use Gridded\ApiReservationExtension\ApiResources\Reservations\ReservationRequest;
+use Gridded\ApiReservationExtension\ApiResources\Reservations\ReservationTransformer;
+use Gridded\ApiReservationExtension\ApiResources\Reservations\ReservationRepository;
 
-class ReservationTransformer extends TransformerAbstract
+class ReservationsController extends ApiController
 {
-    public function transform(Reservation $reservation): array
-    {
-        return $reservation->toArray();
-    }
+    public array $implement = [RestController::class];
+
+    public array $restConfig = [
+        'actions' => [
+            'store' => [],
+        ],
+        'request' => ReservationRequest::class,
+        'repository' => ReservationRepository::class,
+        'transformer' => ReservationTransformer::class,
+    ];
 }

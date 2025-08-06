@@ -16,6 +16,7 @@ RUN composer require tastyigniter/ti-theme-orange -W && \
     composer install --no-dev --optimize-autoloader && \
     php artisan vendor:publish --tag=laravel-assets --ansi --force
 
+RUN chown -R www-data:www-data /var/www/html
 
 # --- FASE 2: PRODUCCIÓN ---
 FROM php:8.3-fpm

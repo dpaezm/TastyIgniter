@@ -15,6 +15,8 @@ Este repositorio está preparado para hacer despliegues automáticos en producci
 
 ## 🧪 Requisitos de despliegue
 
+New resource - Public repository
+
 Debes definir estas variables en Coolify (o en un archivo `.env` si haces despliegue manual):
 
 ```env

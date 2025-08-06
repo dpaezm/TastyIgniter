@@ -17,6 +17,6 @@ class Extension extends BaseExtension
 
     public function registerRoutes()
     {
-        RouteRegistrar::instance()->registerRoutesFromFile(__DIR__.'/routes.php');
+          RouteRegistrar::instance()->registerRoutesFromFile(__DIR__.'/routes.php');
     }
 }

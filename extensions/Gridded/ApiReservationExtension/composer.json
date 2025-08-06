@@ -1,21 +1,23 @@
 {
-    "name": "gridded/api-reservation-extension",
-    "description": "Extension TastyIgniter para crear reservas via API.",
-    "type": "tastyigniter-extension",
-    "authors": [
-        {
-            "name": "Diego Paez",
-            "email": "diego@gridded.agency"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Gridded\\ApiReservationExtension\\": ""
-        }
-    },
-    "extra": {
-        "code": "Gridded.ApiReservationExtension",
-        "name": "API Reservation Extension",
-        "namespace": "Gridded\\ApiReservationExtension"
+  "name": "gridded/api-reservation-extension",
+  "description": "API para crear reservas.",
+  "type": "tastyigniter-extension",
+  "authors": [
+    {
+      "name": "Diego Paez",
+      "email": "diego@gridded.agency"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Gridded\\ApiReservationExtension\\": "src/"
+    }
+  },
+  "extra": {
+    "tastyigniter-extension": {
+      "code": "Gridded.ApiReservationExtension",
+      "name": "API Reservation Extension",
+      "description": "API para crear reservas con asignacion automatica."
+    }
+  }
 }

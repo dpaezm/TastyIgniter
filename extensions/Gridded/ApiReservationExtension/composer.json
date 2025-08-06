@@ -1,23 +1,26 @@
 {
-  "name": "gridded/api-reservation-extension",
-  "description": "API para crear reservas.",
-  "type": "tastyigniter-extension",
-  "authors": [
-    {
-      "name": "Diego Paez",
-      "email": "diego@gridded.agency"
+    "name": "gridded/api-reservation-extension",
+    "description": "API para crear reservas.",
+    "type": "tastyigniter-extension",
+    "authors": [
+        {
+            "name": "Diego Paez",
+            "email": "diego@gridded.agency"
+        }
+    ],
+    "require": {
+        "tastyigniter/flame": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gridded\\ApiReservationExtension\\": "src/"
+        }
+    },
+    "extra": {
+        "tastyigniter-extension": {
+            "code": "Gridded.ApiReservationExtension",
+            "name": "API Reservation Extension",
+            "description": "API para crear reservas con asignacion automatica."
+        }
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "Gridded\\ApiReservationExtension\\": "src/"
-    }
-  },
-  "extra": {
-    "tastyigniter-extension": {
-      "code": "Gridded.ApiReservationExtension",
-      "name": "API Reservation Extension",
-      "description": "API para crear reservas con asignacion automatica."
-    }
-  }
 }

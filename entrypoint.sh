@@ -13,6 +13,17 @@ env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
 cd /var/www/html
 
+echo "--- Realizando limpieza profunda de la caché ---"
+# Borra los archivos de caché compilados que pueden estar corruptos
+rm -f bootstrap/cache/packages.php
+rm -f bootstrap/cache/services.php
+rm -f bootstrap/cache/config.php
+
+# Vuelve a descubrir todo desde cero AHORA, en un estado limpio.
+echo "--- Redescubriendo paquetes y extensiones ---"
+php artisan package:discover
+
+
 # Asegurar carpetas necesarias para Laravel
 mkdir -p storage/framework/{cache/data,sessions,views} && chown -R www-data:www-data storage
 

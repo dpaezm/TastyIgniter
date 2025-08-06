@@ -34,7 +34,7 @@
     },
     {
       "type": "path",
-      "url": "extensions/Gridded/ApiReservationExtension"
+      "url": "extensions/Gridded/apireservationextension"
     }
   ],
   "require": {

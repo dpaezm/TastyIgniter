@@ -9,9 +9,20 @@ done
 echo "Base de datos disponible ✔"
 
 echo "--- ENTRYPOINT iniciado ---"
-env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
+env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THE_ME)'
 
 cd /var/www/html
+
+# ====================================================================
+# ✅ INICIO DEL BLOQUE DE PERMISOS REFORZADO (AL PRINCIPIO)
+# ====================================================================
+echo "--- Asegurando permisos de directorios de escritura ---"
+mkdir -p storage/framework/{cache/data,sessions,views}
+chown -R www-data:www-data storage bootstrap/cache public
+chmod -R 775 storage bootstrap/cache
+# ====================================================================
+# ✅ FIN DEL BLOQUE
+# ====================================================================
 
 echo "--- Realizando limpieza profunda de la caché ---"
 rm -f bootstrap/cache/packages.php
@@ -20,9 +31,6 @@ rm -f bootstrap/cache/config.php
 
 echo "--- Redescubriendo paquetes y extensiones (ignorando errores) ---"
 php artisan package:discover || true
-
-# Asegurar carpetas necesarias para Laravel
-mkdir -p storage/framework/{cache/data,sessions,views} && chown -R www-data:www-data storage
 
 # Crear .env si no existe
 if [ ! -f ".env" ]; then

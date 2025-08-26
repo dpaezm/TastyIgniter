@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5092cdab299068755b7f206924b8af18",
+    "content-hash": "5ea535913f3d3aea069384b79b61d405",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -1952,8 +1952,8 @@
             "version": "4.x-dev",
             "dist": {
                 "type": "path",
-                "url": "extensions/Gridded/ApiReservationExtension",
-                "reference": "f5535ce679a2f13cf554e5767325234c473a8ead"
+                "url": "extensions/gridded/apireservationextension",
+                "reference": "164509cff79905da375e26682e1a041ee11a898d"
             },
             "require": {
                 "tastyigniter/core": "^4.0"
@@ -1979,6 +1979,7 @@
             ],
             "description": "API para crear reservas.",
             "transport-options": {
+                "symlink": false,
                 "relative": true
             }
         },

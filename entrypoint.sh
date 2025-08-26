@@ -9,7 +9,7 @@ done
 echo "Base de datos disponible ✔"
 
 echo "--- ENTRYPOINT iniciado ---"
-env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THE_ME)'
+env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 
 cd /var/www/html
 
@@ -17,12 +17,19 @@ cd /var/www/html
 # ✅ INICIO DEL BLOQUE DE PERMISOS REFORZADO (AL PRINCIPIO)
 # ====================================================================
 echo "--- Asegurando permisos de directorios de escritura ---"
-mkdir -p storage/framework/{cache/data,sessions,views}
+# Creamos las carpetas que podrían no existir en un volumen nuevo
+mkdir -p storage/framework/{sessions,views,cache/data}
+mkdir -p storage/logs
+mkdir -p storage/app/public/media
+# Damos propiedad a todos los directorios que Laravel/TastyIgniter necesita para escribir.
 chown -R www-data:www-data storage bootstrap/cache public
+# Aseguramos que los permisos sean correctos (lectura/escritura para el propietario y grupo)
 chmod -R 775 storage bootstrap/cache
 # ====================================================================
 # ✅ FIN DEL BLOQUE
 # ====================================================================
+
+# ... (El resto de tu script de limpieza de caché y comandos de Artisan permanece igual) ...
 
 echo "--- Realizando limpieza profunda de la caché ---"
 rm -f bootstrap/cache/packages.php

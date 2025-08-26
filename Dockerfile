@@ -34,8 +34,8 @@ FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
     nginx mariadb-client \
-    libpng16-16 libzip4 libjpeg62-turbo libfreetype6 libicu72 \
- && rm -rf /var/lib/apt/lists/*
+    libpng16-16t64 libzip5 libjpeg62-turbo libfreetype6 libicu76 zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 

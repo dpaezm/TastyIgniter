@@ -36,34 +36,28 @@ class ReservationRepository extends AbstractRepository
             throw new ApplicationException('El estado de reserva confirmada no está configurado en el sistema.');
         }
 
-        // --- LÓGICA DE DISPONIBILIDAD (VERSIÓN SIMPLIFICADA Y SEGURA) ---
+        // --- LÓGICA DE DISPONIBILIDAD MEJORADA (CONSULTA DIRECTA A BD) ---
         $startTime = $reservationDateTime->copy();
         $endTime = $reservationDateTime->copy()->addMinutes($stayTime);
 
-        // Obtenemos todas las reservas confirmadas para ese día
-        $reservationsOnDate = Reservation::query()
+        $bookedTableIds = Reservation::query()
             ->where('location_id', $locationId)
             ->where('status_id', $confirmedStatusId)
             ->whereDate('reserve_date', $startTime->toDateString())
-            ->get();
-
-        $bookedTableIds = [];
-        foreach ($reservationsOnDate as $existingReservation) {
-            $existingStartTime = Carbon::parse($existingReservation->reserve_date->toDateString().' '.$existingReservation->reserve_time, $locationTimezone);
-            $existingEndTime = $existingStartTime->copy()->addMinutes($existingReservation->duration ?? $stayTime);
-
-            // Comprobación de solapamiento (StartA < EndB) and (EndA > StartB)
-            if ($existingStartTime < $endTime && $existingEndTime > $startTime) {
-                $bookedTableIds[] = $existingReservation->table_id;
-            }
-        }
+            ->where(function ($query) use ($startTime, $endTime, $stayTime) {
+                $query->whereTime('reserve_time', '<', $endTime->format('H:i:s'))
+                      ->whereRaw('ADDTIME(reserve_time, SEC_TO_TIME(duration * 60)) > ?', [$startTime->format('H:i:s')]);
+            })
+            ->pluck('table_id')
+            ->filter()
+            ->unique();
 
         $availableTable = Table::query()
             ->where('is_enabled', true)
             ->where('location_id', $locationId)
             ->where('min_capacity', '<=', $guestNum)
             ->where('max_capacity', '>=', $guestNum)
-            ->whereNotIn('table_id', array_unique($bookedTableIds))
+            ->whereNotIn('table_id', $bookedTableIds)
             ->orderBy('priority', 'desc')->orderBy('max_capacity', 'asc')
             ->first();
 
@@ -71,12 +65,11 @@ class ReservationRepository extends AbstractRepository
             throw new ApplicationException('No hay mesas disponibles para los criterios seleccionados.');
         }
 
-        // --- CREACIÓN DE LA RESERVA ---
         $reservation = new Reservation();
         $reservation->fill($attributes);
         $reservation->location_id = $locationId;
         $reservation->table_id = $availableTable->table_id;
-        $reservation->duration = $stayTime;
+        $reservation->duration = $stayTime; // Guardamos la duración
         $reservation->status_id = $confirmedStatusId;
         if ($customer = auth()->user()) {
             $reservation->customer_id = $customer->getKey();

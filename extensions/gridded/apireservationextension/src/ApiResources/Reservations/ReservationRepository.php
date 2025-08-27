@@ -36,40 +36,34 @@ class ReservationRepository extends AbstractRepository
             throw new ApplicationException('El estado de reserva confirmada no está configurado en el sistema.');
         }
 
-        $reservationEndDateTime = $reservationDateTime->copy()->addMinutes($stayTime);
+        // --- LÓGICA DE DISPONIBILIDAD (VERSIÓN SIMPLIFICADA Y SEGURA) ---
+        $startTime = $reservationDateTime->copy();
+        $endTime = $reservationDateTime->copy()->addMinutes($stayTime);
 
-        // ==========================================================
-        // ✅ INICIO: CORRECCIÓN DE LA CONSULTA DE DISPONIBILIDAD
-        // ==========================================================
-        $bookedTableIds = Reservation::query()
+        // Obtenemos todas las reservas confirmadas para ese día
+        $reservationsOnDate = Reservation::query()
             ->where('location_id', $locationId)
             ->where('status_id', $confirmedStatusId)
-            // Filtramos por las reservas que ocurren en la misma fecha
-            ->whereDate('reserve_date', $reservationDateTime->toDateString())
-            // Ahora comprobamos el solapamiento de tiempo
-            ->where(function ($query) use ($reservationDateTime, $stayTime) {
-                // Hora de inicio de la nueva reserva
-                $startTime = $reservationDateTime->format('H:i:s');
-                // Hora de fin de la nueva reserva
-                $endTime = $reservationDateTime->copy()->addMinutes($stayTime)->format('H:i:s');
+            ->whereDate('reserve_date', $startTime->toDateString())
+            ->get();
 
-                // Lógica de solapamiento:
-                // Una reserva existente (A) se solapa con la nueva (B) si:
-                // HoraInicio(A) < HoraFin(B) Y HoraFin(A) > HoraInicio(B)
-                $query->whereTime('reserve_time', '<', $endTime)
-                      ->whereRaw('ADDTIME(reserve_time, SEC_TO_TIME(? * 60)) > ?', [$stayTime, $startTime]);
-            })
-            ->pluck('table_id')->filter()->unique();
-        // ==========================================================
-        // ✅ FIN: CORRECCIÓN DE LA CONSULTA DE DISPONIBILIDAD
-        // ==========================================================
+        $bookedTableIds = [];
+        foreach ($reservationsOnDate as $existingReservation) {
+            $existingStartTime = Carbon::parse($existingReservation->reserve_date->toDateString().' '.$existingReservation->reserve_time, $locationTimezone);
+            $existingEndTime = $existingStartTime->copy()->addMinutes($existingReservation->duration ?? $stayTime);
+
+            // Comprobación de solapamiento (StartA < EndB) and (EndA > StartB)
+            if ($existingStartTime < $endTime && $existingEndTime > $startTime) {
+                $bookedTableIds[] = $existingReservation->table_id;
+            }
+        }
 
         $availableTable = Table::query()
             ->where('is_enabled', true)
             ->where('location_id', $locationId)
             ->where('min_capacity', '<=', $guestNum)
             ->where('max_capacity', '>=', $guestNum)
-            ->whereNotIn('table_id', $bookedTableIds)
+            ->whereNotIn('table_id', array_unique($bookedTableIds))
             ->orderBy('priority', 'desc')->orderBy('max_capacity', 'asc')
             ->first();
 
@@ -77,11 +71,12 @@ class ReservationRepository extends AbstractRepository
             throw new ApplicationException('No hay mesas disponibles para los criterios seleccionados.');
         }
 
+        // --- CREACIÓN DE LA RESERVA ---
         $reservation = new Reservation();
         $reservation->fill($attributes);
         $reservation->location_id = $locationId;
         $reservation->table_id = $availableTable->table_id;
-        $reservation->duration = $stayTime; // El modelo sí tiene un campo `duration` para guardar
+        $reservation->duration = $stayTime;
         $reservation->status_id = $confirmedStatusId;
         if ($customer = auth()->user()) {
             $reservation->customer_id = $customer->getKey();

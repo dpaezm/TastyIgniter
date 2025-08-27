@@ -9,25 +9,26 @@ use Igniter\Flame\Exception\ApplicationException;
 use Igniter\Local\Facades\Location;
 use Igniter\Reservation\Models\Reservation;
 use Igniter\Reservation\Models\Table;
+use Illuminate\Database\Eloquent\Model as EloquentModel; // Alias para EloquentModel
 
 class ReservationRepository extends AbstractRepository
 {
     protected ?string $modelClass = Reservation::class;
 
     /**
-     * Este es el método que el RestController buscará y ejecutará.
-     * La firma ahora es 100% compatible con la clase padre.
+     * La firma ahora es 100% compatible con la clase padre, incluyendo los "union types".
      */
-    public function create(Model $model, array $data): Model
+    public function create(Model|EloquentModel $model, array $attributes): Model|EloquentModel
     {
-        $locationId = $data['location_id'];
-        $guestNum = $data['guest_num'];
+        // El resto del código usa $attributes en lugar de $data
+        $locationId = $attributes['location_id'];
+        $guestNum = $attributes['guest_num'];
 
         // 1. MANEJO DE ZONA HORARIA
         $location = Location::getById($locationId);
         if (!$location) throw new ApplicationException('Location not found.');
         $locationTimezone = $location->timezone ?? config('app.timezone');
-        $reservationDateTime = Carbon::parse($data['reserve_date'].' '.$data['reserve_time'], $locationTimezone);
+        $reservationDateTime = Carbon::parse($attributes['reserve_date'].' '.$attributes['reserve_time'], $locationTimezone);
 
         // 2. COMPROBAR HORARIO
         $workingSchedule = resolve('working_schedule', ['location' => $locationId]);
@@ -65,7 +66,7 @@ class ReservationRepository extends AbstractRepository
 
         // 5. CREAR Y GUARDAR
         $reservation = new Reservation();
-        $reservation->fill($data);
+        $reservation->fill($attributes);
         $reservation->table_id = $availableTable->table_id;
         $reservation->duration = $stayTime;
         $reservation->reservation_datetime = $reservationDateTime;

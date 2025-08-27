@@ -9,6 +9,7 @@ use Igniter\Flame\Exception\ApplicationException;
 use Igniter\Local\Facades\Location;
 use Igniter\Reservation\Models\Reservation;
 use Igniter\Reservation\Models\Table;
+use Igniter\Local\Classes\WorkingSchedule; // <-- IMPORTANTE: Importar la clase correcta
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 class ReservationRepository extends AbstractRepository
@@ -26,8 +27,8 @@ class ReservationRepository extends AbstractRepository
         $locationTimezone = $location->timezone ?? config('app.timezone');
         $reservationDateTime = Carbon::parse($attributes['reserve_date'].' '.$attributes['reserve_time'], $locationTimezone);
 
-        // 2. COMPROBAR HORARIO (CON LA CORRECCIÓN)
-        $workingSchedule = $location->workingSchedule(); // <-- ¡LA LÍNEA CORREGIDA!
+        // 2. COMPROBAR HORARIO (CON LA CORRECCIÓN FINAL)
+        $workingSchedule = new WorkingSchedule($location); // <-- ¡LA LÍNEA CORREGIDA!
         if (!$workingSchedule->isOpen($reservationDateTime)) {
             throw new ApplicationException('El restaurante está cerrado a la hora y fecha seleccionadas.');
         }

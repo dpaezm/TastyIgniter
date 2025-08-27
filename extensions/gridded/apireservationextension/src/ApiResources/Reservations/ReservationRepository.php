@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Igniter\Api\Classes\AbstractRepository;
 use Igniter\Flame\Database\Model;
 use Igniter\Flame\Exception\ApplicationException;
+use Igniter\Local\Classes\WorkingSchedule; // Importamos la clase directamente
 use Igniter\Local\Facades\Location;
 use Igniter\Reservation\Models\Reservation;
 use Igniter\Reservation\Models\Table;
@@ -26,9 +27,10 @@ class ReservationRepository extends AbstractRepository
         $locationTimezone = $location->timezone ?? config('app.timezone');
         $reservationDateTime = Carbon::parse($attributes['reserve_date'].' '.$attributes['reserve_time'], $locationTimezone);
 
-        // 2. COMPROBAR HORARIO (CON LA CORRECCIÓN FINAL Y DEFINITIVA)
-        $workingSchedule = resolve('location.schedule', ['location' => $location]); // <-- ¡LA LÍNEA CORREGIDA!
-        if (!$workingSchedule->isOpen($reservationDateTime)) {
+        // 2. COMPROBAR HORARIO (100% MANUAL)
+        // Obtenemos el tipo de horario para 'reservation'
+        $schedule = $location->workingSchedule('reservation'); 
+        if (!$schedule->isOpen($reservationDateTime)) {
             throw new ApplicationException('El restaurante está cerrado a la hora y fecha seleccionadas.');
         }
 

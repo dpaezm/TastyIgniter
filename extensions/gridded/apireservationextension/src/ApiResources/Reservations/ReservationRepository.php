@@ -16,17 +16,14 @@ class ReservationRepository extends AbstractRepository
 
     public function create(Model|EloquentModel $model, array $attributes): Model|EloquentModel
     {
-        // --- CONFIGURACIONES FIJAS ---
         $locationId = 1;
         $locationTimezone = 'Europe/Madrid';
         $stayTime = 90;
 
-        // Si no se proporciona un email en la petición, usamos uno por defecto.
         if (empty($attributes['email'])) {
-            $attributes['email'] = 'reservas@beautiful-app.gridded.agency'; // Email por defecto
+            $attributes['email'] = 'reservas@beautiful-app.gridded.agency';
         }
 
-        // --- VALIDACIÓN Y PREPARACIÓN DE DATOS ---
         $guestNum = $attributes['guest_num'];
         $reservationDateTime = Carbon::parse(
             $attributes['reserve_date'].' '.$attributes['reserve_time'],
@@ -38,15 +35,23 @@ class ReservationRepository extends AbstractRepository
             throw new ApplicationException('El estado de reserva confirmada no está configurado en el sistema.');
         }
 
-        // --- LÓGICA DE DISPONIBILIDAD ---
         $reservationEndDateTime = $reservationDateTime->copy()->addMinutes($stayTime);
 
+        // CORRECCIÓN 1: Usar los nombres de columna correctos para la consulta
         $bookedTableIds = Reservation::query()
             ->where('location_id', $locationId)
             ->where('status_id', $confirmedStatusId)
             ->where(function ($query) use ($reservationDateTime, $reservationEndDateTime) {
-                $query->where('reservation_datetime', '<', $reservationEndDateTime)
-                      ->whereRaw('ADDTIME(reservation_datetime, SEC_TO_TIME(duration * 60)) > ?', [$reservationDateTime]);
+                $query->where('reserve_date', $reservationDateTime->toDateString())
+                      ->where(function($q) use ($reservationDateTime, $reservationEndDateTime) {
+                          $q->whereBetween('reserve_time', [
+                              $reservationDateTime->toTimeString(),
+                              $reservationEndDateTime->toTimeString()
+                          ])->orWhereBetween(DB::raw("ADDTIME(reserve_time, SEC_TO_TIME(duration * 60))"), [
+                              $reservationDateTime->toTimeString(),
+                              $reservationEndDateTime->toTimeString()
+                          ]);
+                      });
             })
             ->pluck('table_id')->filter()->unique();
 
@@ -63,13 +68,13 @@ class ReservationRepository extends AbstractRepository
             throw new ApplicationException('No hay mesas disponibles para los criterios seleccionados.');
         }
 
-        // --- CREACIÓN DE LA RESERVA ---
         $reservation = new Reservation();
         $reservation->fill($attributes);
         $reservation->location_id = $locationId;
         $reservation->table_id = $availableTable->table_id;
         $reservation->duration = $stayTime;
-        $reservation->reservation_datetime = $reservationDateTime;
+        // CORRECCIÓN 2: No asignar a reservation_datetime directamente
+        // El modelo lo calcula a partir de reserve_date y reserve_time, que ya están en $attributes
         $reservation->status_id = $confirmedStatusId;
         if ($customer = auth()->user()) {
             $reservation->customer_id = $customer->getKey();

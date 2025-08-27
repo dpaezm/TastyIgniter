@@ -17,7 +17,7 @@ class ReservationRepository extends AbstractRepository
      * Crea una nueva reserva con validación completa.
      * Este método es llamado por el RestController en una petición POST.
      */
-    public function create(array $data): Reservation
+    public function createReservation(array $data): Reservation
     {
         $locationId = $data['location_id'];
         $guestNum = $data['guest_num'];

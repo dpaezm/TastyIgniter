@@ -9,18 +9,14 @@ use Igniter\Flame\Exception\ApplicationException;
 use Igniter\Local\Facades\Location;
 use Igniter\Reservation\Models\Reservation;
 use Igniter\Reservation\Models\Table;
-use Illuminate\Database\Eloquent\Model as EloquentModel; // Alias para EloquentModel
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 class ReservationRepository extends AbstractRepository
 {
     protected ?string $modelClass = Reservation::class;
 
-    /**
-     * La firma ahora es 100% compatible con la clase padre, incluyendo los "union types".
-     */
     public function create(Model|EloquentModel $model, array $attributes): Model|EloquentModel
     {
-        // El resto del código usa $attributes en lugar de $data
         $locationId = $attributes['location_id'];
         $guestNum = $attributes['guest_num'];
 
@@ -30,8 +26,8 @@ class ReservationRepository extends AbstractRepository
         $locationTimezone = $location->timezone ?? config('app.timezone');
         $reservationDateTime = Carbon::parse($attributes['reserve_date'].' '.$attributes['reserve_time'], $locationTimezone);
 
-        // 2. COMPROBAR HORARIO
-        $workingSchedule = resolve('working_schedule', ['location' => $locationId]);
+        // 2. COMPROBAR HORARIO (CON LA CORRECCIÓN)
+        $workingSchedule = $location->workingSchedule(); // <-- ¡LA LÍNEA CORREGIDA!
         if (!$workingSchedule->isOpen($reservationDateTime)) {
             throw new ApplicationException('El restaurante está cerrado a la hora y fecha seleccionadas.');
         }

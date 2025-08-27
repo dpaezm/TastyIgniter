@@ -46,7 +46,7 @@ class ReservationRepository extends AbstractRepository
             ->whereDate('reserve_date', $startTime->toDateString())
             ->where(function ($query) use ($startTime, $endTime, $stayTime) {
                 $query->whereTime('reserve_time', '<', $endTime->format('H:i:s'))
-                      ->whereRaw('ADDTIME(reserve_time, SEC_TO_TIME(duration * 60)) > ?', [$startTime->format('H:i:s')]);
+                      ->whereRaw('ADDTIME(reserve_time, SEC_TO_TIME(? * 60)) > ?', [$stayTime, $startTime->format('H:i:s')]);
             })
             ->pluck('table_id')
             ->filter()

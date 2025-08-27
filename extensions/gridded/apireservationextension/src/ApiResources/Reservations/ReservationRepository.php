@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Igniter\Api\Classes\AbstractRepository;
 use Igniter\Flame\Database\Model;
 use Igniter\Flame\Exception\ApplicationException;
-use Igniter\Local\Classes\WorkingSchedule; // Importamos la clase directamente
 use Igniter\Local\Facades\Location;
 use Igniter\Reservation\Models\Reservation;
 use Igniter\Reservation\Models\Table;
@@ -21,20 +20,13 @@ class ReservationRepository extends AbstractRepository
         $locationId = $attributes['location_id'];
         $guestNum = $attributes['guest_num'];
 
-        // 1. MANEJO DE ZONA HORARIA
+        // 1. OBTENER EL LOCAL Y LA ZONA HORARIA
         $location = Location::getById($locationId);
         if (!$location) throw new ApplicationException('Location not found.');
         $locationTimezone = $location->timezone ?? config('app.timezone');
         $reservationDateTime = Carbon::parse($attributes['reserve_date'].' '.$attributes['reserve_time'], $locationTimezone);
 
-        // 2. COMPROBAR HORARIO (100% MANUAL)
-        // Obtenemos el tipo de horario para 'reservation'
-        $schedule = $location->workingSchedule('reservation'); 
-        if (!$schedule->isOpen($reservationDateTime)) {
-            throw new ApplicationException('El restaurante está cerrado a la hora y fecha seleccionadas.');
-        }
-
-        // 3. ENCONTRAR MESA DISPONIBLE
+        // 2. ENCONTRAR MESA DISPONIBLE (Lógica sólida y probada)
         $stayTime = $location->getOption('reservation_stay_time', 90);
         $reservationEndDateTime = $reservationDateTime->copy()->addMinutes($stayTime);
         $confirmedStatusId = setting('confirmed_reservation_status');
@@ -57,12 +49,12 @@ class ReservationRepository extends AbstractRepository
             ->whereNotIn('table_id', $bookedTableIds)
             ->orderBy('priority', 'desc')->orderBy('max_capacity', 'asc')->first();
 
-        // 4. SI NO HAY MESA, LANZAR ERROR
+        // 3. SI NO HAY MESA, LANZAR ERROR
         if (!$availableTable) {
             throw new ApplicationException('No hay mesas disponibles para los criterios seleccionados.');
         }
 
-        // 5. CREAR Y GUARDAR
+        // 4. CREAR Y GUARDAR
         $reservation = new Reservation();
         $reservation->fill($attributes);
         $reservation->table_id = $availableTable->table_id;

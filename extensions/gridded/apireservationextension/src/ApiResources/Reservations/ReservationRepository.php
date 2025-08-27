@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Igniter\Api\Classes\AbstractRepository;
 use Igniter\Flame\Database\Model;
 use Igniter\Flame\Exception\ApplicationException;
-use Igniter\Local\Facades\Location;
 use Igniter\Reservation\Models\Reservation;
 use Igniter\Reservation\Models\Table;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
@@ -17,20 +16,30 @@ class ReservationRepository extends AbstractRepository
 
     public function create(Model|EloquentModel $model, array $attributes): Model|EloquentModel
     {
-        $locationId = $attributes['location_id'];
+        // --- CONFIGURACIONES FIJAS ---
+        $locationId = 1;
+        $locationTimezone = 'Europe/Madrid';
+        $stayTime = 90;
+
+        // Si no se proporciona un email en la petición, usamos uno por defecto.
+        if (empty($attributes['email'])) {
+            $attributes['email'] = 'reservas@beautiful-app.gridded.agency'; // Email por defecto
+        }
+
+        // --- VALIDACIÓN Y PREPARACIÓN DE DATOS ---
         $guestNum = $attributes['guest_num'];
+        $reservationDateTime = Carbon::parse(
+            $attributes['reserve_date'].' '.$attributes['reserve_time'],
+            $locationTimezone
+        );
 
-        // 1. OBTENER EL LOCAL Y LA ZONA HORARIA
-        $location = Location::getById($locationId);
-        if (!$location) throw new ApplicationException('Location not found.');
-        $locationTimezone = $location->timezone ?? config('app.timezone');
-        $reservationDateTime = Carbon::parse($attributes['reserve_date'].' '.$attributes['reserve_time'], $locationTimezone);
-
-        // 2. ENCONTRAR MESA DISPONIBLE (Lógica sólida y probada)
-        $stayTime = $location->getOption('reservation_stay_time', 90);
-        $reservationEndDateTime = $reservationDateTime->copy()->addMinutes($stayTime);
         $confirmedStatusId = setting('confirmed_reservation_status');
-        if (!$confirmedStatusId) throw new ApplicationException('El estado de reserva confirmada no está configurado.');
+        if (!$confirmedStatusId) {
+            throw new ApplicationException('El estado de reserva confirmada no está configurado en el sistema.');
+        }
+
+        // --- LÓGICA DE DISPONIBILIDAD ---
+        $reservationEndDateTime = $reservationDateTime->copy()->addMinutes($stayTime);
 
         $bookedTableIds = Reservation::query()
             ->where('location_id', $locationId)
@@ -47,21 +56,24 @@ class ReservationRepository extends AbstractRepository
             ->where('min_capacity', '<=', $guestNum)
             ->where('max_capacity', '>=', $guestNum)
             ->whereNotIn('table_id', $bookedTableIds)
-            ->orderBy('priority', 'desc')->orderBy('max_capacity', 'asc')->first();
+            ->orderBy('priority', 'desc')->orderBy('max_capacity', 'asc')
+            ->first();
 
-        // 3. SI NO HAY MESA, LANZAR ERROR
         if (!$availableTable) {
             throw new ApplicationException('No hay mesas disponibles para los criterios seleccionados.');
         }
 
-        // 4. CREAR Y GUARDAR
+        // --- CREACIÓN DE LA RESERVA ---
         $reservation = new Reservation();
         $reservation->fill($attributes);
+        $reservation->location_id = $locationId;
         $reservation->table_id = $availableTable->table_id;
         $reservation->duration = $stayTime;
         $reservation->reservation_datetime = $reservationDateTime;
         $reservation->status_id = $confirmedStatusId;
-        if ($customer = auth()->user()) $reservation->customer_id = $customer->getKey();
+        if ($customer = auth()->user()) {
+            $reservation->customer_id = $customer->getKey();
+        }
         $reservation->save();
 
         return $reservation;

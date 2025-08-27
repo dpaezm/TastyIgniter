@@ -9,14 +9,13 @@ class ReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'location_id'  => ['required', 'integer'],
-            'guest_num'    => ['required', 'integer'],
-            'first_name'   => ['required', 'string'],
-            'last_name'    => ['required', 'string'],
-            'email'        => ['required', 'email'],
+            'guest_num'    => ['required', 'integer', 'min:1'],
+            'first_name'   => ['required', 'string', 'min:2'],
             'telephone'    => ['required', 'string'],
             'reserve_date' => ['required', 'date_format:Y-m-d'],
             'reserve_time' => ['required', 'date_format:H:i'],
+            'comment'      => ['nullable', 'string'],
+            'email'        => ['nullable', 'email'], // <-- CAMBIO CLAVE: 'required' a 'nullable'
         ];
     }
 }

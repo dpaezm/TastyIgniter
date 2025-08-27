@@ -14,16 +14,16 @@ env | grep -E '^(APP_|DB_|CACHE_|SESSION_|TI_THEME)'
 cd /var/www/html
 
 # ====================================================================
-# ✅ INICIO DEL BLOQUE DE PERMISOS REFORZADO (AL PRINCIPIO)
+# ✅ INICIO DEL BLOQUE DE PERMISOS (TU BLOQUE MEJORADO)
 # ====================================================================
 echo "--- Asegurando permisos de directorios de escritura ---"
 # Creamos las carpetas que podrían no existir en un volumen nuevo
 mkdir -p storage/framework/{sessions,views,cache/data}
 mkdir -p storage/logs
 mkdir -p storage/app/public/media
-# Damos propiedad a todos los directorios que Laravel/TastyIgniter necesita para escribir.
+# Damos propiedad a los directorios de escritura
 chown -R www-data:www-data storage bootstrap/cache public
-# Aseguramos que los permisos sean correctos (lectura/escritura para el propietario y grupo)
+# Aseguramos que los permisos sean correctos
 chmod -R 775 storage bootstrap/cache
 # ====================================================================
 # ✅ FIN DEL BLOQUE
@@ -51,8 +51,15 @@ if ! grep -q "^APP_KEY=" .env && [ -n "$APP_KEY" ]; then
   echo "--- APP_KEY añadido al .env automáticamente ---"
 fi
 
+# ====================================================================
+# ✅ LÍNEA AÑADIDA PARA SOLUCIONAR EL PROBLEMA DE LA CARTÉ KEY
+# ====================================================================
+# Aseguramos que el archivo .env tenga el propietario correcto para poder escribir en él
+chown www-data:www-data .env || true
+# ====================================================================
+
 # Todos los comandos de Artisan se ejecutan con '|| true' para ignorar el bug
-echo "--- Ejecutando comandos de inicialización (ignorando errores) ---"
+echo "--- Ejecurando comandos de inicialización (ignorando errores) ---"
 php artisan storage:link || true
 php artisan migrate --force || true
 php artisan igniter:up --force || true

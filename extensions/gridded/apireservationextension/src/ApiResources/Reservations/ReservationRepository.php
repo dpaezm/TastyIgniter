@@ -16,9 +16,9 @@ class ReservationRepository extends AbstractRepository
 
     /**
      * Este es el método que el RestController buscará y ejecutará.
-     * Ignoramos el $model que nos pasa y usamos nuestra propia lógica.
+     * La firma ahora es 100% compatible con la clase padre.
      */
-    public function create(Model $model, array $data): Reservation
+    public function create(Model $model, array $data): Model
     {
         $locationId = $data['location_id'];
         $guestNum = $data['guest_num'];

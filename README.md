@@ -36,8 +36,8 @@ DB_PORT=3306
 LOG_CHANNEL=stderr
 QUEUE_CONNECTION=sync
 
-CACHE_DRIVER=database
-SESSION_DRIVER=database
+CACHE_DRIVER=file
+SESSION_DRIVER=file
 CACHE_DB_TABLE=ti_cache
 
 TI_THEME=igniter-orange
